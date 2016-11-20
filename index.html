@@ -609,21 +609,25 @@ function outdentBlock(text)
     }
     return result;
 }
+
 function pushRightBlock()
 {
     var lnRange = getSelectedLineRange();
     var currentLine = getTextInRange(lnRange[0], lnRange[1]);
     if (!currentLine.match(/ *\*/))
     {
-        return;
+    	moveRight();
     }
-    var currentCursorWidth = currentCursorPos();
-    var cursor = getSelectedLineRange()[0];
-    var currentBlock = getCurrentBlock(cursor);
-    var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
-    var replacedContent = indentBlock(currentBlockContent);
-    setTextInRange(currentBlock[0], currentBlock[1], replacedContent);
-    setSelectedRange(currentBlock[0] + currentCursorWidth + 4, 0);
+    else
+    {    
+        var currentCursorWidth = currentCursorPos();
+        var cursor = getSelectedLineRange()[0];
+        var currentBlock = getCurrentBlock(cursor);
+        var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
+        var replacedContent = indentBlock(currentBlockContent);
+        setTextInRange(currentBlock[0], currentBlock[1], replacedContent);
+        setSelectedRange(currentBlock[0] + currentCursorWidth + 4, 0);
+    }
 }
 
 
@@ -637,20 +641,23 @@ function pushLeftBlock()
     }
     if (!currentLine.match(/ *\*/))
     {
-        return;
+        moveLeft();
     }
-    var currentCursorWidth = currentCursorPos();
-    var cursor = getSelectedLineRange()[0];
-    var currentBlock = getCurrentBlock(cursor);
-    var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
-    var replacedContent = outdentBlock(currentBlockContent);
-    setTextInRange(currentBlock[0], currentBlock[1], replacedContent);
-    var minusCursor = 0;
-    if (currentCursorWidth - 4 > 0)
+    else
     {
-        minusCursor = currentCursorWidth - 4;
+        var currentCursorWidth = currentCursorPos();
+        var cursor = getSelectedLineRange()[0];
+        var currentBlock = getCurrentBlock(cursor);
+        var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
+        var replacedContent = outdentBlock(currentBlockContent);
+        setTextInRange(currentBlock[0], currentBlock[1], replacedContent);
+        var minusCursor = 0;
+        if (currentCursorWidth - 4 > 0)
+        {
+            minusCursor = currentCursorWidth - 4;
+        }
+        setSelectedRange(currentBlock[0] + minusCursor, 0);
     }
-    setSelectedRange(currentBlock[0] + minusCursor, 0);
 }
 
 function checkBoxExists(cursor)
