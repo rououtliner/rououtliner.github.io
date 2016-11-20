@@ -867,6 +867,10 @@ function checkBoxIsNotChecked(cursor)
 
 function insertCheckBox(cursor)
 {
+	if (getStarPos(cursor) == -1)
+	{
+		return;
+	}
     var currentLine = getCurrentLine(cursor);
     var currentRange = getSelectedRange();
     var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
