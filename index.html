@@ -109,15 +109,18 @@ function init()
         }
         else if (key == 222 && ctrl) // ctrl '
         {
-        	//alert("aaa");
             e.preventDefault();
             insertComment();
         }
         else if (key == 66 && ctrl) // ctrl b
         {
-        	//alert("aaa");
             e.preventDefault();
             bold();
+        }
+        else if (key == 73 && ctrl) // ctrl i
+        {
+            e.preventDefault();
+            italic();
         }
         else if (key == 9 && shift) // shift tab
         {
@@ -932,6 +935,22 @@ function bold()
 	{
 		setTextInRange(currentRange[0], currentRange[1], '**' + text + '**');
 		setSelectedRange(currentRange[0] + 2, currentRange[1]);
+	}
+}
+
+function italic()
+{
+	var currentRange = getSelectedRange();
+	var text = getTextInRange(currentRange[0], currentRange[1]);
+	if (getTextInRange(currentRange[0] - 1, 1) == '*' && getTextInRange(currentRange[0] + currentRange[1], 1) == '*')
+	{
+		setTextInRange(currentRange[0] - 1, currentRange[1] + 2, text);
+		setSelectedRange(currentRange[0] - 1, currentRange[1]);
+	}
+	else
+	{
+		setTextInRange(currentRange[0], currentRange[1], '*' + text + '*');
+		setSelectedRange(currentRange[0] + 1, currentRange[1]);
 	}
 }
 
