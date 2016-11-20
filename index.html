@@ -442,7 +442,7 @@ function getNextLine(cursor)
     else
     {
         var lnRange = getCurrentLine(cursor);
-        var pos = lnRange[0] + lnRange[1] + 1;
+        var pos = lnRange[0] + lnRange[1];
         return getCurrentLine(pos);
     }
 }
@@ -470,6 +470,10 @@ function getPreviousBlock(cursor)
         }
         var previousLine = getPreviousLine(startPos);
         startPos = previousLine[0];
+        if (previousLine[1] == 1) // empty line
+        {
+        	break;
+        }
         if (getStarPos(startPos) == starPosCurrentLine)
         {
             found = true;
@@ -512,7 +516,13 @@ function getCurrentBlock(cursor)
             alert("inf loop: getCurrentBlock()");
             break;
         }
-        startPos = getNextLine(startPos)[0];
+        var nextLine = getNextLine(startPos);
+        startPos = nextLine[0];
+        if (nextLine[1] == 1) // empty line
+        {
+        	startPos = getCurrentLine(startPos - 1)[0];
+        	break;
+        }
         var currentStarPos = getStarPos(startPos);
         if (currentStarPos >= 0 && currentStarPos <= starPos)
         {
@@ -559,8 +569,13 @@ function getNextBlock(cursor)
             alert("inf loop: getNextBlock()");
             break;
         }
-        startPos = getNextLine(startPos)[0];
+        var nextLine = getNextLine(startPos);
+        startPos = nextLine[0];
         var currentStarPos = getStarPos(startPos);
+        if (nextLine[1] == 1) // empty line
+        {
+        	return -1;
+        }
         if (currentStarPos >= 0 && currentStarPos < starPos)
         {
             return -1;
@@ -589,7 +604,7 @@ function pushDownBlock()
     {
         nextBlockContent = nextBlockContent + '\n';
     }
-    setTextInRange(cursor, currentBlock[1] + nextBlock[1], nextBlockContent +     currentBlockContent);
+    setTextInRange(cursor, currentBlock[1] + nextBlock[1], nextBlockContent + currentBlockContent);
     setSelectedRange(cursor + nextBlockContent.length + currentCursorWidth, 0);
 }
 
