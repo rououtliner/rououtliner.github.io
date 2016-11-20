@@ -140,6 +140,11 @@ function init()
             e.preventDefault();
             pushRightBlock();
         }
+        else if (key == 13 && shift)
+        {
+        	e.preventDefault();
+        	shiftEnterSpaceStarIfNeeded();
+        }
         else if (key == 13) // enter
         {
         	gotoEndOfLine();
@@ -150,12 +155,29 @@ function init()
     {
         e = e || window.event;
         var key = e.which || e.keyCode; // keyCode detection
-        if (key == 13)
+        var shift = e.shiftKey ? e.shiftKey : ((key === 16) ? true : false); // alt detection
+        if (key == 13 && shift) // shift + enter
+        {
+        	e.preventDefault();
+        	//alert("aaa");
+        }
+        else if (key == 13)
         {
             enterSpaceStarIfNeeded();
         }
     },false);
     setSelectedRange(0, 0);
+}
+
+function gotoPreviousLine()
+{
+	var cursor = getCursor();
+	if (isFirstLine(cursor))
+	{
+		return;
+	}
+	var previousLine = getPreviousLine(cursor);
+	setSelectedRange(previousLine[0] + previousLine[1] - 1, 0);
 }
 
 function gotoEndOfLine()
@@ -169,6 +191,37 @@ function gotoEndOfLine()
     else
     {
         setSelectedRange(lnRange[0] + lnRange[1], 0);
+    }
+}
+
+function shiftEnterSpaceStarIfNeeded()
+{
+    var lnRange = getCurrentLine(getCursor());
+    var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
+    if (currentLineText.match(/^ *\* /))
+    {
+    	var currentLineStarPos = currentLineText.indexOf('* ');
+        var result = "\n";
+        for (var i = 0; i < currentLineStarPos; i++)
+        {
+            result += " ";
+        }
+        result += "* ";
+        var cursor = lnRange[0];
+        setTextInRange(cursor - 1, 0, result);
+        setSelectedRange(cursor + result.length - 1, 0);
+    }
+    else
+    {
+    	var currentLineSpacePos = currentLineText.search(/[^ ]/);
+        var result = "\n";
+        for (var i = 0; i < currentLineSpacePos; i++)
+        {
+            result += " ";
+        }
+        var cursor = lnRange[0];
+        setTextInRange(cursor - 1, 0, result);
+        setSelectedRange(cursor + result.length - 1, 0);
     }
 }
 
