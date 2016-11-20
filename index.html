@@ -21,7 +21,7 @@ function init()
     wd = wd + "\n";
     wd = wd + "---\n";
     wd = wd + "\n";
-    wd = wd + "* Why create this outliner? \n";
+    wd = wd + "* Why create this outliner?\n";
     wd = wd + "    * I (@Roulesophy) am a Drafts4 heavy user in iOS.\n";
     wd = wd + "    * I created some script in Drafts4's for outlining\n";
     wd = wd + "    * Sometimes I am not using iPad I also need to do outlining\n";
@@ -107,6 +107,12 @@ function init()
             e.preventDefault();
             deleteElement(getCursor());
         }
+        else if (key == 222 && ctrl) // ctrl '
+        {
+        	//alert("aaa");
+            e.preventDefault();
+            insertComment();
+        }
         else if (key == 9 && shift) // shift tab
         {
             e.preventDefault();
@@ -150,7 +156,7 @@ function enterSpaceStarIfNeeded()
     }
     else
     {
-        var currentLineSpacePos = currentLineText.search(/[^ ]/);
+    	var currentLineSpacePos = currentLineText.search(/[^ ]/);
         var result = "";
         for (var i = 0; i < currentLineSpacePos; i++)
         {
@@ -874,6 +880,34 @@ function deleteElement(cursor)
 	    setTextInRange(currentBlock[0], currentBlock[1], '');
 	    setSelectedRange(currentBlock[0], 0);
     }
+}
+
+function enterNewLine()
+{
+	var currentLine = getSelectedLineRange();
+    setTextInRange(currentLine[0] + currentLine[1], 0, '\n');
+    setSelectedRange(currentLine[0] + currentLine[1], 0);
+}
+
+function insertComment()
+{
+	var currentLine = getSelectedLineRange();
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    var starPos = getStarPos(getCursor());
+   	enterNewLine();	
+   	var currentLineSpacePos = currentLineText.search(/[^ ]/);
+    var result = "";
+    for (var i = 0; i < currentLineSpacePos; i++)
+    {
+        result += " ";
+    }
+    if (starPos >= 0)
+    {
+    	result += "  ";
+    }
+    var cursor = getCursor();
+    setTextInRange(cursor, 0, result);
+    setSelectedRange(cursor + result.length, 0);
 }
 
 function table()
