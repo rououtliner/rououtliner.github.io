@@ -58,12 +58,12 @@ function init()
     textarea.value = wd;
 
     textarea.addEventListener("click", function()
-            {
-                var alertTxt = '';
-                alertTxt += getCursor(textarea);
-                alertTxt += '<br>' + getSurroundingSelection(textarea);
-                document.getElementById("console").innerHTML = alertTxt;
-            });
+    {
+        var alertTxt = '';
+        alertTxt += getCursor(textarea);
+        alertTxt += '<br>' + getSurroundingSelection(textarea);
+        document.getElementById("console").innerHTML = alertTxt;
+    });
 
     textarea.addEventListener("keydown",function(e)
     {
@@ -120,29 +120,37 @@ function init()
         var key = e.which || e.keyCode; // keyCode detection
         if (key == 13)
         {
-          enterStarIfNeeded();
+          enterSpaceStarIfNeeded();
         }
     },false);
     setSelectedRange(0, 0);
 }
 
-function enterStarIfNeeded()
+function enterSpaceStarIfNeeded()
 {
     var lnRange = getCurrentLine(getCursor() - 1);
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
-    if (!currentLineText.match(/\* /))
+    if (currentLineText.match(/^ *\* /))
     {
-        return;
-    }
-    else
-    {
-        var currentLineStarPos = currentLineText.indexOf('* ');
+    	var currentLineStarPos = currentLineText.indexOf('* ');
         var result = "";
         for (var i = 0; i < currentLineStarPos; i++)
         {
             result += " ";
         }
         result += "* ";
+        var cursor = getCursor();
+        setTextInRange(cursor, 0, result);
+        setSelectedRange(cursor + result.length, 0);
+    }
+    else
+    {
+        var currentLineSpacePos = currentLineText.search(/[^ ]/);
+        var result = "";
+        for (var i = 0; i < currentLineSpacePos; i++)
+        {
+            result += " ";
+        }
         var cursor = getCursor();
         setTextInRange(cursor, 0, result);
         setSelectedRange(cursor + result.length, 0);
@@ -334,8 +342,8 @@ function getCurrentLine(startCharPos)
 function getStarPos(cursor)
 {
     var lnRange = getCurrentLine(cursor);
-    var     text = getTextInRange(lnRange[0], lnRange[1]);
-    if (text.match(/ *\* /))
+    var text = getTextInRange(lnRange[0], lnRange[1]);
+    if (text.match(/^ *\* /))
     {
         var starLength = 0;
         var startPos = lnRange[0];
