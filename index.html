@@ -140,6 +140,10 @@ function init()
             e.preventDefault();
             pushRightBlock();
         }
+        else if (key == 13) // enter
+        {
+        	gotoEndOfLine();
+        }
     },false);
 
     textarea.addEventListener("keyup",function(e)
@@ -148,10 +152,24 @@ function init()
         var key = e.which || e.keyCode; // keyCode detection
         if (key == 13)
         {
-          enterSpaceStarIfNeeded();
+            enterSpaceStarIfNeeded();
         }
     },false);
     setSelectedRange(0, 0);
+}
+
+function gotoEndOfLine()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
+    if (currentLineText.endsWith('\n'))
+    {
+    	setSelectedRange(lnRange[0] + lnRange[1] - 1, 0);
+    }
+    else
+    {
+        setSelectedRange(lnRange[0] + lnRange[1], 0);
+    }
 }
 
 function enterSpaceStarIfNeeded()
