@@ -228,7 +228,12 @@ function gotoEndOfLine()
 
 function shiftEnterSpaceStarIfNeeded()
 {
-    var lnRange = getCurrentLine(getCursor());
+	var cursor = getCursor();
+	if (isFirstLine(cursor))
+	{
+		return;
+	}
+    var lnRange = getCurrentLine(cursor);
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
     if (currentLineText.match(/^ *\* /))
     {
