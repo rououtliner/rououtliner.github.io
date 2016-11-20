@@ -1,0 +1,987 @@
+<html>
+<head>
+	<title>RouOutliner</title>
+	<script type="text/javascript">
+var maxCallCount = 999999;
+
+var textarea;
+window.onload = init;
+
+// ------------------------------------------
+// Rou Writer specific function
+
+function init()
+{
+    textarea = document.getElementById("textarea");
+    textarea.select();
+
+    var wd = "Simplicity is the best.\n";
+    wd = wd + "RouOutliner, a plain text outliner with only three features.\n";
+    wd = wd + "Outliner, Checklist and Table.\n";
+    wd = wd + "\n";
+    wd = wd + "---\n";
+    wd = wd + "\n";
+    wd = wd + "* Why create this outliner? \n";
+    wd = wd + "    * I (@Roulesophy) am a Drafts4 heavy user in iOS.\n";
+    wd = wd + "    * I created some script in Drafts4's for outlining\n";
+    wd = wd + "    * Sometimes I am not using iPad I also need to do outlining\n";
+    wd = wd + "    * I really missed those functions I developed!\n";
+    wd = wd + "    * Therefore, RouOutliner is out :)\n";
+    wd = wd + "* Why plain text? \n";
+    wd = wd + "    * Plain text is the content which can stay for longest time\n";
+    wd = wd + "        * Needs specific program to open proprietary format\n";
+    wd = wd + "        * What if we cannot use them?\n"; 
+    wd = wd + "    * It is better to do version control\n";
+    wd = wd + "* How to use this outliner? \n";
+    wd = wd + "    * Organising your idea:\n";
+    wd = wd + "        * Type all random thinkings in your mind here\n";
+    wd = wd + "        * Use our indend function to make hierarcy\n";
+    wd = wd + "            * Try Ctrl-H and Ctrl L here!\n";
+    wd = wd + "        * Use our reordering function to create sequence\n";
+    wd = wd + "            * Important thing comes first\n";
+    wd = wd + "            * Try Ctrl-J and Ctrl K here!\n";
+    wd = wd + "        * Convert the idea to action\n";
+    wd = wd + "            * Insert todo for points needed\n";
+    wd = wd + "            * Try Ctrl-O here! Press at least 5 times ;)\n";
+    wd = wd + "    * Use table to make your idea clear\n";
+    wd = wd + "        * It is hard to read the table format like the following\n";
+    wd = wd + "        * Try Ctrl-T here! It will format the table ;)\n";
+    wd = wd + "\n";
+    wd = wd + "\n";
+    wd = wd + "||Plain Text|proprietary format|\n";
+    wd = wd + "|---|---|---|\n";
+    wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
+    wd = wd + "|Text Editor|Vim|TextEdit|\n";
+
+    
+
+    textarea.value = wd;
+
+    textarea.addEventListener("click", function()
+            {
+                var alertTxt = '';
+                alertTxt += getCursor(textarea);
+                alertTxt += '<br>' + getSurroundingSelection(textarea);
+                document.getElementById("console").innerHTML = alertTxt;
+            });
+
+    textarea.addEventListener("keydown",function(e)
+    {
+        e = e || window.event;
+        var key = e.which || e.keyCode; // keyCode detection
+        var ctrl = e.ctrlKey ? e.ctrlKey : ((key === 17) ? true : false); // ctrl detection
+        var alt = e.altKey ? e.altKey : ((key === 18) ? true : false); // ctrl detection
+        if (key == 72 && ctrl) // ctrl h
+        {
+            e.preventDefault();
+            pushLeftBlock();
+        }
+        else if (key == 74 && ctrl) // ctrl j
+        {
+            e.preventDefault();
+            pushDownBlock();
+        }
+        else if (key == 75 && ctrl) // ctrl k
+        {
+            e.preventDefault();
+            pushUpBlock();
+        }
+        else if (key == 76 && ctrl) // ctrl l
+        {
+            e.preventDefault();
+            pushRightBlock();
+        }
+        else if (key == 79 && ctrl) // ctrl 0
+        {
+            e.preventDefault();
+            handleCheckBox(getCursor());
+        }
+        else if (key == 84 && ctrl) // ctrl t
+        {
+            e.preventDefault();
+            table();
+        }
+    },false);
+
+    textarea.addEventListener("keyup",function(e)
+    {
+        e = e || window.event;
+        var key = e.which || e.keyCode; // keyCode detection
+        if (key == 13)
+        {
+          enterStarIfNeeded();
+        }
+    },false);
+    setSelectedRange(0, 0);
+}
+
+function enterStarIfNeeded()
+{
+    var lnRange = getCurrentLine(getCursor() - 1);
+    var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
+    if (!currentLineText.match(/\* /))
+    {
+        return;
+    }
+    else
+    {
+        var currentLineStarPos = currentLineText.indexOf('* ');
+        var result = "";
+        for (var i = 0; i < currentLineStarPos; i++)
+        {
+            result += " ";
+        }
+        result += "* ";
+        var cursor = getCursor();
+        setTextInRange(cursor, 0, result);
+        setSelectedRange(cursor + result.length, 0);
+    }
+}
+
+//------------------------------------------------------------------------------------------
+// Drafts function
+
+function getText()
+{
+    // returns the full text currently being edited
+    return textarea.value;
+}
+
+function setText(string)
+{
+    // replaces full text being edited with string
+    textarea.value = string;
+}
+
+function getSelectedText()
+{
+    // return only the selected text. If no text selection exists, this will return an empty string.
+    return getMiddleCursorSelection();
+}
+
+function setSelectedText(string)
+{
+    // Replace only the current selected text range with the string. Also updates the selected range to match any change in length of the new string.
+    textarea.value = getBeforeCursorSelection() + string + getAfterCursorSelection();
+}
+
+function getTextInRange(start, length)
+{
+
+    // Return text in the request range.
+    return textarea.value.substring(start, start + length);
+}
+
+function setTextInRange(start, length, string)
+{
+    // Replace the text in the specified range with the value of string.
+    textarea.value = textarea.value.substring(0, start) + string + textarea.value.substring(start + length, textarea.value.length);
+}
+function getSelectedLineRange()
+{
+    // Returns the range (start,length) of the full line based on the current cursor position
+    return getCurrentLine(getCursor());
+}
+function getSelectedRange()
+{
+    // Returns the current selected text range as an array with values [start, length].
+    var result = new Array();
+    result[0] = textarea.selectionStart;
+    result[1] = textarea.selectionEnd - textarea.selectionStart;
+    return result;
+}
+function setSelectedRange(start, length)
+{
+    // Set the selected range of text. Invalid ranges will be automatically adjusted, and this text selection will be applied after successful completion of the script.
+    setSelectionRange(start, start + length);
+}
+function getClipboard()
+{
+    // Returns current contents of the system clipboard.
+    // Not supported yet
+}
+function setClipboard(string)
+{
+
+    // Set the system clipboard to the string passed.
+    // Not supported yet
+}
+function markdown(string, useXHTML)
+{
+
+    // runs the string through the Markdown processor returning HTML.
+    // Not supported yet
+}
+function encodeHTMLEntities(string)
+{
+    // Encodes the string to HTML safe entities, e.g. converting & to &amp;
+    // Not supported yet
+}
+function decodeHTMLEntities(string)
+{
+    //Decodes HTML entities.
+    // Not supported yet
+}
+
+//---------------------------------------------------------------------------------------------------
+// Drafts adapter function
+
+function setSelectionRange(selectionStart, selectionEnd)
+{
+    if (textarea.setSelectionRange)
+    {
+        textarea.focus();
+        textarea.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (textarea.createTextRange)
+    {
+        var range = textarea.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+}
+
+function setCaretToPos(pos)
+{
+    setSelectionRange(pos, pos);
+}
+
+function getCursor()
+{
+    return textarea.selectionStart;
+}
+function getSurroundingSelection()
+{
+    return [textarea.value.substring(0, textarea.selectionStart)
+        ,textarea.value.substring(textarea.selectionStart, textarea.selectionEnd)
+        ,textarea.value.substring(textarea.selectionEnd, textarea.value.length)]
+}
+function getBeforeCursorSelection()
+{
+    return textarea.value.substring(0, textarea.selectionStart);
+}
+function getMiddleCursorSelection()
+{
+    return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+}
+function getAfterCursorSelection()
+{
+    return textarea.value.substring(textarea.selectionEnd, textarea.value.length);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Self function
+
+function getCurrentLine(startCharPos)
+{
+    var startPos;
+    var length = 0;
+    if (startCharPos == 0)
+    {
+        startPos = startCharPos;
+    }
+    else
+    {    startPos = startCharPos;
+        var calls = 0;
+        while (startPos != 0 && getTextInRange(startPos - 1, 1) != '\n')
+        {
+            calls += 1;
+            if (calls > maxCallCount)
+            {
+                alert("inf loop: getCurrentLine()");
+                break;
+            }
+            startPos--;
+        }
+    }
+    var tempPos = startPos;
+    var allTextLength = getText().length;
+    var calls = 0;
+    while (tempPos != allTextLength && getTextInRange(tempPos, 1) != '\n')
+    {
+        calls += 1;
+        if (calls > maxCallCount)
+        {
+            alert("inf loop: getCurrentLine()");
+            break;
+        }
+        tempPos++;
+        length++;
+    }
+    if (tempPos != allTextLength)
+    {
+        length++;
+    }
+    var result = new Array();
+    result[0] = startPos;
+    result[1] = length;
+    return result;
+}
+
+function getStarPos(cursor)
+{
+    var lnRange = getCurrentLine(cursor);
+    var     text = getTextInRange(lnRange[0], lnRange[1]);
+    if (text.match(/ *\* /))
+    {
+        var starLength = 0;
+        var startPos = lnRange[0];
+        var calls = 0;
+        while (getTextInRange(startPos, 1) != '*')
+        {
+            calls += 1;
+            if (calls > maxCallCount)
+            {
+                alert("inf loop: getStarPos()");
+                break;
+            }
+            startPos++;
+            starLength++;
+        }
+        return starLength;
+    }
+    return -1;
+}
+
+function cursorPos(cursor)
+{
+    return cursor - getCurrentLine(cursor)[0];
+}
+
+function currentCursorPos()
+{
+    return getSelectedRange()[0] - getSelectedLineRange()[0];
+}
+
+function isFirstLine(cursor)
+{
+    return getCurrentLine(cursor)[0] == 0;
+}
+
+function isLastLine(cursor)
+{
+    var lnRange = getCurrentLine(cursor);
+    return lnRange[0] + lnRange[1] == getText().length;
+}
+
+function getPreviousLine(cursor)
+{
+    if (isFirstLine(cursor))
+    {
+        return -1;
+    }
+    else
+    {
+        var pos = getCurrentLine(cursor)[0] - 1;
+        return getCurrentLine(pos);
+    }
+}
+
+function getNextLine(cursor)
+{
+    if (isLastLine(cursor))
+    {
+        return -1;
+    }
+    else
+    {
+        var lnRange = getCurrentLine(cursor);
+        var pos = lnRange[0] + lnRange[1] + 1;
+        return getCurrentLine(pos);
+    }
+}
+
+function getPreviousBlock(cursor)
+{
+    var starPos = getStarPos(cursor);
+    var currentLine = getCurrentLine(cursor);
+    if (starPos == -1)
+    {
+        return -1;
+    }
+    var startPos = currentLine[0];
+    var starPosCurrentLine = getStarPos(currentLine[0]);
+    var found = false;
+    var previousBlockPos = -1;
+    var calls = 0;
+    while (!found && !isFirstLine(startPos))
+    {
+        calls += 1;
+        if (calls > maxCallCount)
+        {
+            alert("inf loop: getPreviousBlock()");
+            break;
+        }
+        var previousLine = getPreviousLine(startPos);
+        startPos = previousLine[0];
+        if (getStarPos(startPos) == starPosCurrentLine)
+        {
+            found = true;
+            previousBlockPos = startPos;
+        }
+    }
+    if (found)
+    {
+        var previousBlock = new Array();
+        previousBlock[0] = previousBlockPos;
+        previousBlock[1] = currentLine[0] - previousBlockPos;
+        return previousBlock;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+function getCurrentBlock(cursor)
+{
+    var starPos = getStarPos(cursor);
+    var currentLine = getCurrentLine(cursor);
+    if (starPos == -1)
+    {
+        return -1;
+    }
+    if (isLastLine(cursor))
+    {
+        return currentLine;
+    }
+    var startPos = currentLine[0];
+    var found = false;
+    var calls = 0;
+    while(!found && !isLastLine(startPos))
+    {
+        calls += 1;
+        if (calls > maxCallCount)
+        {
+            alert("inf loop: getCurrentBlock()");
+            break;
+        }
+        startPos = getNextLine(startPos)[0];
+        if (getStarPos(startPos) <= starPos)
+        {
+            found = true;
+        }
+    }
+    if (found)
+    {
+        startPos = getPreviousLine(startPos)[0];
+        var result = new Array();
+        result[0] = currentLine[0];
+        result[1] = startPos + getCurrentLine(startPos)[1] - currentLine[0];
+        return result;
+    }
+    else
+    {
+        var result = new Array();
+        result[0] = currentLine[0];
+        result[1] = startPos + getCurrentLine(startPos)[1] - currentLine[0];
+        return result;
+    }
+}
+
+function getNextBlock(cursor)
+{
+    var starPos = getStarPos(cursor);
+    var currentLine = getCurrentLine(cursor);
+    if (starPos == -1)
+    {
+        return -1;
+    }
+    if (isLastLine(cursor))
+    {
+        return -1;
+    }
+    var startPos = currentLine[0];
+    var found = false;
+    var calls = 0;
+    while(!found && !isLastLine(startPos))
+    {
+        calls += 1;
+        if (calls > maxCallCount)
+        {
+            alert("inf loop: getNextBlock()");
+            break;
+        }
+        startPos = getNextLine(startPos)[0];
+        if (getStarPos(startPos) < starPos)
+        {
+            return -1;
+        }
+        if (getStarPos(startPos) == starPos)
+        {
+            return getCurrentBlock(startPos);
+        }
+    }
+    return -1;
+}
+
+function pushDownBlock()
+{
+    var currentCursorWidth = currentCursorPos();
+    var cursor = getSelectedLineRange()[0];
+    var currentBlock = getCurrentBlock(cursor);
+    var nextBlock = getNextBlock(cursor);
+    if (currentBlock == -1 || nextBlock == -1)
+    {
+        return;
+    }
+    var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
+    var nextBlockContent = getTextInRange(nextBlock[0], nextBlock[1]);
+    if (!nextBlockContent.endsWith('\n'))
+    {
+        nextBlockContent = nextBlockContent + '\n';
+    }
+    setTextInRange(cursor, currentBlock[1] + nextBlock[1], nextBlockContent +     currentBlockContent);
+    setSelectedRange(cursor + nextBlockContent.length + currentCursorWidth, 0);
+}
+
+function pushUpBlock()
+{
+    var currentCursorWidth = currentCursorPos();
+    var cursor = getSelectedLineRange()[0];
+    var currentBlock = getCurrentBlock(cursor);
+    var previousBlock = getPreviousBlock(cursor);
+    if (currentBlock == -1 || previousBlock == -1)
+    {
+        return;
+    }
+    var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
+    var previousBlockContent = getTextInRange(previousBlock[0], previousBlock[1]);
+    if (!currentBlockContent.endsWith('\n'))
+    {
+        currentBlockContent = currentBlockContent + '\n';
+    }
+    setTextInRange(previousBlock[0], previousBlock[1] + currentBlock[1], currentBlockContent + previousBlockContent);
+    setSelectedRange(previousBlock[0] + currentCursorWidth, 0);
+}
+
+function indentBlock(text)
+{
+    var endsWithNewLine = text.endsWith('\n');
+    if (endsWithNewLine)
+    {
+        text = text.substring(0, text.length - 1);
+    }
+    var lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++)
+    {
+        lines[i] = lines[i].replace(/^/, '    ');
+    }
+    var result = lines.join('\n');
+    if (endsWithNewLine)
+    {
+        result = result + '\n';
+    }
+    return result;
+}
+
+function outdentBlock(text)
+{
+    var endsWithNewLine = text.endsWith('\n');
+    if (endsWithNewLine)
+    {
+        text = text.substring(0, text.length - 1);
+    }
+    var lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++)
+    {
+        lines[i] = lines[i].replace(/^    /, '');
+    }
+    var result = lines.join('\n');
+    if (endsWithNewLine)
+    {
+        result = result + '\n';
+    }
+    return result;
+}
+function pushRightBlock()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLine = getTextInRange(lnRange[0], lnRange[1]);
+    var currentCursorWidth = currentCursorPos();
+    var cursor = getSelectedLineRange()[0];
+    var currentBlock = getCurrentBlock(cursor);
+    var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
+    var replacedContent = indentBlock(currentBlockContent);
+    setTextInRange(currentBlock[0], currentBlock[1], replacedContent);
+    setSelectedRange(currentBlock[0] + currentCursorWidth + 4, 0);
+}
+
+
+function pushLeftBlock()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLine = getTextInRange(lnRange[0], lnRange[1]);
+    if (!currentLine.startsWith('    '))
+    {
+        return;
+    }
+    var currentCursorWidth = currentCursorPos();
+    var cursor = getSelectedLineRange()[0];
+    var currentBlock = getCurrentBlock(cursor);
+    var currentBlockContent = getTextInRange(currentBlock[0], currentBlock[1]);
+    var replacedContent = outdentBlock(currentBlockContent);
+    setTextInRange(currentBlock[0], currentBlock[1], replacedContent);
+    var minusCursor = 0;
+    if (currentCursorWidth - 4 > 0)
+    {
+        minusCursor = currentCursorWidth - 4;
+    }
+    setSelectedRange(currentBlock[0] + minusCursor, 0);
+}
+
+function checkBoxExists(cursor)
+{
+    var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    if (currentLineText.match(/\* \[ \] /))
+    {
+        return true;
+    }
+    else if (currentLineText.match(/\* \[x\] /))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function checkBoxIsChecked(cursor)
+{
+    var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    if (currentLineText.match(/\* \[x\] /))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function checkBoxIsNotChecked(cursor)
+{
+    var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    if (currentLineText.match(/\* \[ \] /))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function insertCheckBox(cursor)
+{
+    var currentLine = getCurrentLine(cursor);
+    var currentRange = getSelectedRange();
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    var checkBox = currentLineText.replace(/\* /, '* \[ \] ');
+    setTextInRange(currentLine[0], currentLine[1], checkBox);
+    setSelectedRange(currentRange[0] + 4, 0);
+}
+
+function toggleCheckBox(cursor)
+{
+    var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    var notChecked = /\* \[ \] /;
+    var checked = /\* \[x\] /;
+    if (currentLineText.match(notChecked))
+    {
+        currentLineText = currentLineText.replace(notChecked, '* [x] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(checked))
+    {
+        currentLineText = currentLineText.replace(checked, '* [ ] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+}
+
+function handleCheckBox(cursor)
+{
+    if (checkBoxExists(cursor))
+    {
+        toggleCheckBox(cursor);
+    }
+    else
+    {
+        insertCheckBox(cursor);
+    }
+}
+
+function moveLeft()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLineStart = lnRange[0];
+    var currentLineLength = lnRange[1];
+    var currentCursorPos = getSelectedRange()[0];
+
+    var currentLineContent = getTextInRange(currentLineStart, currentLineLength);
+    currentLineContent = currentLineContent.replace(/^    /, '');
+
+    setTextInRange(currentLineStart, currentLineLength, currentLineContent);
+    setSelectedRange(currentCursorPos - 4, 0);
+}
+
+
+function moveRight()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLineStart = lnRange[0];
+    var currentLineLength = lnRange[1];
+    var currentCursorPos = getSelectedRange()[0];
+
+    var currentLineContent = getTextInRange(currentLineStart, currentLineLength);
+    currentLineContent = currentLineContent.replace(/^/, '    ');
+
+    setTextInRange(currentLineStart, currentLineLength, currentLineContent);
+    setSelectedRange(currentCursorPos + 4, 0);
+}
+
+
+function moveUp()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLineStart = lnRange[0];
+    var currentLineLength = lnRange[1];
+    var cursorOffset = getSelectedRange()[0] - currentLineStart;
+
+    if (currentLineStart != 0)
+    {
+        var startCharPos = currentLineStart - 2;
+        while (getTextInRange(startCharPos, 1) != '\n' && startCharPos != 0)
+        {
+            startCharPos--;
+        }
+        if (startCharPos != 0)
+        {
+            startCharPos++;
+        }
+        var prevLineStart = startCharPos;
+        var prevLineLength = currentLineStart - prevLineStart;
+        var prevLineContent = getTextInRange(prevLineStart, prevLineLength);
+        var currentLineContent = getTextInRange(currentLineStart, currentLineLength);
+        if (!currentLineContent.endsWith('\n'))
+        {
+            currentLineContent = currentLineContent + '\n';
+        }
+        setTextInRange(prevLineStart, prevLineLength + currentLineLength, currentLineContent + prevLineContent);
+        setSelectedRange(prevLineStart + cursorOffset,0)
+    }
+}
+
+function moveDown()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLineStart = lnRange[0];
+    var currentLineLength = lnRange[1];
+
+    var cursorOffset = getSelectedRange()[0] - currentLineStart;
+    var allTextLength = getText().length;
+    if (currentLineStart + currentLineLength != allTextLength) // last line
+    {
+        var startCharPos = currentLineStart + currentLineLength;
+        while (getTextInRange(startCharPos, 1) != '\n' && startCharPos != allTextLength)
+        {
+            startCharPos++;
+        }
+        if (startCharPos != 0)
+        {
+            startCharPos++;
+        }
+        var nextLineStart = currentLineStart + currentLineLength;
+        var nextLineLength = startCharPos - nextLineStart;
+        var nextLineContent = getTextInRange(nextLineStart, nextLineLength);
+        var currentLineContent = getTextInRange(currentLineStart, currentLineLength);
+        if (!nextLineContent.endsWith('\n'))
+        {
+            nextLineContent = nextLineContent + '\n'
+        }
+        setTextInRange(currentLineStart, currentLineLength + nextLineLength, nextLineContent + currentLineContent);
+        setSelectedRange(currentLineStart + nextLineLength + cursorOffset,0)
+    }
+}
+
+function table()
+{
+    var alertTxt = '';
+
+    // grab all content
+    var text = '';
+    var selectedRange = getSelectedRange();
+    var selectedMode = (selectedRange[1] == 0);
+    if (selectedMode)
+    {
+        text = getText();
+    }
+    else
+    {
+        text = getSelectedText();
+    }
+
+    // get max column number
+    var lineData = text.split('\n')
+        var rowNum = lineData.length;
+    var colNum = 1;
+    for (i = 0; i < rowNum; i++)
+    {
+        var currentLineColNum = lineData[i].split('|').length;
+        if (currentLineColNum > colNum)
+        {
+            colNum = currentLineColNum;
+        }
+    }
+    alertTxt = alertTxt + '\nColNum=' + colNum;
+
+    // create data array[row][col] to place data, data[row][col]
+    var data = new Array(rowNum);
+    for (var i = 0; i < rowNum; i++)
+    {
+        data[i] = new Array(colNum);
+    }
+
+    // create array[col] to record column max length, maxLength[col]
+    var colMaxLength = new Array(colNum);
+
+    // create array[row] to record whether it should be tableize (boolean) shouldTableize[row]
+    var shouldTableize = new Array(rowNum);
+
+    // find whether the row should be tableize for each row and put to array[row]
+    for (var i = 0; i < rowNum; i++)
+    {
+        if (lineData[i].split('|').length == 1)
+        {
+            shouldTableize[i] = false;
+        }
+        else
+        {
+            shouldTableize[i] = true;
+        }
+        alertTxt = alertTxt + '\nRow ' + i + '=' + shouldTableize[i];
+    }
+
+    // put split data to the data array[row][col]
+    for (var i = 0; i < rowNum; i++)
+    {
+        var colData = lineData[i].split('|');
+        var colLength = colData.length;
+        for (var j = 0; j < colLength; j++)
+        {
+            data[i][j] = colData[j];
+            alertTxt = alertTxt + '\n' + data[i][j];
+        }
+    }
+
+    // calculate and put max length of column to array[col], need to skip array[row] = false
+    for (var j = 0; j < colNum; j++)
+    {
+        eachColMaxLength = 0;
+        for (var i = 0; i < rowNum; i++)
+        {
+            if (shouldTableize[i] && data[i][j] != undefined)
+            {
+                var dataLength = String(data[i][j]).length;
+                alertTxt = alertTxt + '\n' + dataLength;
+                if (dataLength > eachColMaxLength)
+                {
+                    eachColMaxLength = dataLength;
+                }
+            }
+        }
+        colMaxLength[j] = eachColMaxLength;
+        alertTxt = alertTxt + '\nCol ' + j + '=' + colMaxLength[j];
+    }
+
+
+    // enrich spaces for each cell
+    for (var i = 0; i < rowNum; i++)
+    {
+        if (shouldTableize[i])
+        {
+            for (var j = 0; j < colNum; j++)
+            {
+                var spaceNum = colMaxLength[j] - String(data[i][j]).length;
+                for (var spaceCount = 0; spaceCount < spaceNum; spaceCount++)
+                {
+                    data[i][j] = data[i][j] + ' ';
+                }
+            }
+        }
+    }
+
+    // join the array
+    var finalLineData = new Array(rowNum);
+    for(var i = 0; i < rowNum; i++)
+    {
+        if (shouldTableize[i])
+        {
+            finalLineData[i] = data[i].join('|');
+        }
+        else
+        {
+            finalLineData[i] = data[i][0];
+        }
+    }
+    var finalText = finalLineData.join('\n');
+
+
+    // replace with selected data
+    //alertTxt = alertTxt + '\n' + finalText;
+    if (selectedMode)
+    {
+        setTextInRange(0, text.length, finalText);
+    }
+    else
+    {
+        setTextInRange(selectedRange[0], selectedRange[1], finalText);
+    }
+}
+
+
+function test()
+{
+    var lnRange = getSelectedLineRange();
+    var currentLine = getCurrentLine(lnRange[0]);
+
+    alertTxt = 'lnRange=' + lnRange[0] + ',' + lnRange[1] + '\ncurrentLine=' +     currentLine[0] + ',' + currentLine[1];
+
+    var starPosition = getStarPos(lnRange[0]);
+    alertTxt = alertTxt + '\nstarPosition=' + starPosition;
+
+    alertTxt = alertTxt + '\nisFirstLine=' + isFirstLine(currentLine[0]);
+    alertTxt = alertTxt + '\nisLastLine=' + isLastLine(currentLine[0]);
+
+    var previousLine = getPreviousLine(currentLine[0]);
+    var nextLine = getNextLine(currentLine[0]);
+    alertTxt = alertTxt + '\npreviousLine=' + previousLine[0] + ',' + previousLine[1];
+    alertTxt = alertTxt + '\nnextLine=' + nextLine[0] + ',' + nextLine[1];
+
+    var previousBlock = getPreviousBlock(currentLine[0]);
+    alertTxt = alertTxt + '\nPreviousBlock=' + previousBlock[0] + ',' + previousBlock[1];
+
+    var currentBlock = getCurrentBlock(currentLine[0]);
+    alertTxt = alertTxt + '\nCurrentBlock=' + currentBlock[0] + ',' + currentBlock[1];
+
+    var nextBlock = getNextBlock(currentLine[0]);
+    alertTxt = alertTxt + '\nNextBlock=' + nextBlock[0] + ',' + nextBlock[1];
+
+    alert(alertTxt);
+}
+	</script>	
+</head>
+
+<body>
+	<textarea id="textarea" style="width:100%; height:100%;font-family: monospace;font-size:14px"></textarea>
+	<div id="console" hidden></div>
+</body>
