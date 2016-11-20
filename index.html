@@ -92,7 +92,7 @@ function init()
             e.preventDefault();
             pushRightBlock();
         }
-        else if (key == 79 && ctrl) // ctrl 0
+        else if (key == 79 && ctrl) // ctrl o
         {
             e.preventDefault();
             handleCheckBox(getCursor());
@@ -101,6 +101,11 @@ function init()
         {
             e.preventDefault();
             table();
+        }
+        else if (key == 68 && ctrl) // ctrl d
+        {
+            e.preventDefault();
+            deleteElement(getCursor());
         }
         else if (key == 9 && shift) // shift tab
         {
@@ -194,7 +199,11 @@ function getTextInRange(start, length)
 function setTextInRange(start, length, string)
 {
     // Replace the text in the specified range with the value of string.
-    textarea.value = textarea.value.substring(0, start) + string + textarea.value.substring(start + length, textarea.value.length);
+    var text = string;
+    var event = document.createEvent('TextEvent');
+    setSelectedRange(start, length);
+    event.initTextEvent('textInput', true, true, null, text || "\0");
+    textarea.dispatchEvent(event); // fire the event on the the textarea
 }
 function getSelectedLineRange()
 {
@@ -845,7 +854,25 @@ function moveDown()
             nextLineContent = nextLineContent + '\n'
         }
         setTextInRange(currentLineStart, currentLineLength + nextLineLength, nextLineContent + currentLineContent);
-        setSelectedRange(currentLineStart + nextLineLength + cursorOffset,0)
+        setSelectedRange(currentLineStart + nextLineLength + cursorOffset, 0)
+    }
+}
+
+function deleteElement(cursor)
+{
+	var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    if (!currentLineText.match(/^ *\* /))
+    {
+    	var currentLine = getCurrentLine(cursor);
+	    setTextInRange(currentLine[0], currentLine[1], '');
+	    setSelectedRange(currentLine[0], 0);
+    }
+    else
+    {	
+	    var currentBlock = getCurrentBlock(cursor);
+	    setTextInRange(currentBlock[0], currentBlock[1], '');
+	    setSelectedRange(currentBlock[0], 0);
     }
 }
 
