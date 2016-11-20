@@ -470,7 +470,8 @@ function getCurrentBlock(cursor)
             break;
         }
         startPos = getNextLine(startPos)[0];
-        if (getStarPos(startPos) <= starPos)
+        var currentStarPos = getStarPos(startPos);
+        if (currentStarPos >= 0 && currentStarPos <= starPos)
         {
             found = true;
         }
@@ -516,11 +517,12 @@ function getNextBlock(cursor)
             break;
         }
         startPos = getNextLine(startPos)[0];
-        if (getStarPos(startPos) < starPos)
+        var currentStarPos = getStarPos(startPos);
+        if (currentStarPos >= 0 && currentStarPos < starPos)
         {
             return -1;
         }
-        if (getStarPos(startPos) == starPos)
+        if (currentStarPos == starPos)
         {
             return getCurrentBlock(startPos);
         }
