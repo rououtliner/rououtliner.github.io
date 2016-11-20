@@ -27,7 +27,7 @@ function init()
     wd = wd + "    * Sometimes I am not using iPad I also need to do outlining\n";
     wd = wd + "    * I really missed those functions I developed!\n";
     wd = wd + "    * Therefore, RouOutliner is out :)\n";
-    wd = wd + "* Why plain text? \n";
+    wd = wd + "* Why plain text?\n";
     wd = wd + "    * Plain text is the content which can stay for longest time\n";
     wd = wd + "        * Needs specific program to open proprietary format\n";
     wd = wd + "        * What if we cannot use them?\n"; 
@@ -52,8 +52,6 @@ function init()
     wd = wd + "|---|---|---|\n";
     wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
     wd = wd + "|Text Editor|Vim|TextEdit|\n";
-
-    
 
     textarea.value = wd;
 
@@ -182,8 +180,8 @@ function enterSpaceStarIfNeeded()
             result += " ";
         }
         var cursor = getCursor();
-        setTextInRange(cursor, 0, result);
-        setSelectedRange(cursor + result.length, 0);
+        setTextInRange(cursor - 1, 1, '  \n' + result);
+        setSelectedRange(cursor + 2 + result.length, 0);
     }
 }
 
@@ -919,6 +917,12 @@ function deleteElement()
     }
 }
 
+function enterTwoSpaces()
+{
+	var currentLine = getSelectedLineRange();
+    setTextInRange(currentLine[0] + currentLine[1] - 1, 0, '  ');
+}
+
 function enterNewLine()
 {
 	var currentLine = getSelectedLineRange();
@@ -931,6 +935,7 @@ function insertComment()
 	var currentLine = getSelectedLineRange();
     var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
     var starPos = getStarPos(getCursor());
+    enterTwoSpaces();
    	enterNewLine();	
    	var currentLineSpacePos = currentLineText.search(/[^ ]/);
     var result = "";
