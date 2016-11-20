@@ -102,6 +102,16 @@ function init()
             e.preventDefault();
             table();
         }
+        else if (key == 9 && shift) // shift tab
+        {
+            e.preventDefault();
+            pushLeftBlock();
+        }
+        else if (key == 9) // tab
+        {
+            e.preventDefault();
+            pushRightBlock();
+        }
     },false);
 
     textarea.addEventListener("keyup",function(e)
