@@ -5,6 +5,7 @@
 var maxCallCount = 999999;
 
 var textarea;
+var localStorageKey = 'content';
 window.onload = init;
 
 // ------------------------------------------
@@ -53,7 +54,16 @@ function init()
     wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
     wd = wd + "|Text Editor|Vim|TextEdit|\n";
 
-    textarea.value = wd;
+    var localStorageItem = localStorage.getItem(localStorageKey);
+    document.getElementById("console").innerHTML = "#" + localStorageItem + "#";
+    if (localStorageItem != null)
+    {
+    	textarea.value = localStorageItem;
+    }
+    else
+    {
+    	textarea.value = wd;
+    }
 
     textarea.addEventListener("click", function()
     {
@@ -125,7 +135,7 @@ function init()
             e.preventDefault();
             insertURL();
         }
-        else if (key == 80 && ctrl) // ctrl u
+        else if (key == 80 && ctrl) // ctrl p
         {
             e.preventDefault();
             insertPicture();
@@ -149,17 +159,27 @@ function init()
         {
         	gotoEndOfLine();
         }
+        
+        if (!(ctrl && key == 81)) // not ctrl Q
+        {
+        	commitToLocalStorage();
+        	document.getElementById("console").innerHTML = localStorage.getItem(localStorageKey);
+        }
+        else
+        {
+        	removeLocalStorage();
+        }
     },false);
 
     textarea.addEventListener("keyup",function(e)
     {
         e = e || window.event;
         var key = e.which || e.keyCode; // keyCode detection
+        var ctrl = e.ctrlKey ? e.ctrlKey : ((key === 17) ? true : false); // ctrl detection
         var shift = e.shiftKey ? e.shiftKey : ((key === 16) ? true : false); // alt detection
         if (key == 13 && shift) // shift + enter
         {
         	e.preventDefault();
-        	//alert("aaa");
         }
         else if (key == 13)
         {
@@ -167,6 +187,18 @@ function init()
         }
     },false);
     setSelectedRange(0, 0);
+}
+
+function commitToLocalStorage()
+{
+	localStorage.setItem(localStorageKey, textarea.value);
+}
+
+function removeLocalStorage()
+{
+	localStorage.removeItem(localStorageKey);
+	textarea.blur();
+	document.getElementById("console").innerHTML = localStorage.getItem(localStorageKey);
 }
 
 function gotoPreviousLine()
