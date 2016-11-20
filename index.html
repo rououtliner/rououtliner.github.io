@@ -113,6 +113,12 @@ function init()
             e.preventDefault();
             insertComment();
         }
+        else if (key == 66 && ctrl) // ctrl b
+        {
+        	//alert("aaa");
+            e.preventDefault();
+            bold();
+        }
         else if (key == 9 && shift) // shift tab
         {
             e.preventDefault();
@@ -911,6 +917,22 @@ function insertComment()
     var cursor = getCursor();
     setTextInRange(cursor, 0, result);
     setSelectedRange(cursor + result.length, 0);
+}
+
+function bold()
+{
+	var currentRange = getSelectedRange();
+	var text = getTextInRange(currentRange[0], currentRange[1]);
+	if (getTextInRange(currentRange[0] - 2, 2) == '**' && getTextInRange(currentRange[0] + currentRange[1], 2) == '**')
+	{
+		setTextInRange(currentRange[0] - 2, currentRange[1] + 4, text);
+		setSelectedRange(currentRange[0] - 2, currentRange[1]);
+	}
+	else
+	{
+		setTextInRange(currentRange[0], currentRange[1], '**' + text + '**');
+		setSelectedRange(currentRange[0] + 2, currentRange[1]);
+	}
 }
 
 function table()
