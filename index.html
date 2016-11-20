@@ -95,7 +95,7 @@ function init()
         else if (key == 79 && ctrl) // ctrl o
         {
             e.preventDefault();
-            handleCheckBox(getCursor());
+            handleCheckBox();
         }
         else if (key == 84 && ctrl) // ctrl t
         {
@@ -105,7 +105,7 @@ function init()
         else if (key == 68 && ctrl) // ctrl d
         {
             e.preventDefault();
-            deleteElement(getCursor());
+            deleteElement();
         }
         else if (key == 222 && ctrl) // ctrl '
         {
@@ -282,10 +282,6 @@ function setCaretToPos(pos)
     setSelectionRange(pos, pos);
 }
 
-function getCursor()
-{
-    return textarea.selectionStart;
-}
 function getSurroundingSelection()
 {
     return [textarea.value.substring(0, textarea.selectionStart)
@@ -307,6 +303,11 @@ function getAfterCursorSelection()
 
 //-------------------------------------------------------------------------------------------------
 // Self function
+
+function getCursor()
+{
+    return getSelectedRange()[0];
+}
 
 function getCurrentLine(startCharPos)
 {
@@ -759,8 +760,9 @@ function toggleCheckBox(cursor)
     }
 }
 
-function handleCheckBox(cursor)
+function handleCheckBox()
 {
+	var cursor = getCursor();
     if (checkBoxExists(cursor))
     {
         toggleCheckBox(cursor);
@@ -864,8 +866,9 @@ function moveDown()
     }
 }
 
-function deleteElement(cursor)
+function deleteElement()
 {
+	var cursor = getCursor();
 	var currentLine = getCurrentLine(cursor);
     var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
     if (!currentLineText.match(/^ *\* /))
