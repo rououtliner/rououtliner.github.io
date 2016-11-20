@@ -70,7 +70,8 @@ function init()
         e = e || window.event;
         var key = e.which || e.keyCode; // keyCode detection
         var ctrl = e.ctrlKey ? e.ctrlKey : ((key === 17) ? true : false); // ctrl detection
-        var alt = e.altKey ? e.altKey : ((key === 18) ? true : false); // ctrl detection
+        var alt = e.altKey ? e.altKey : ((key === 18) ? true : false); // alt detection
+        var shift = e.shiftKey ? e.shiftKey : ((key === 16) ? true : false); // alt detection
         if (key == 72 && ctrl) // ctrl h
         {
             e.preventDefault();
@@ -600,6 +601,10 @@ function pushRightBlock()
 {
     var lnRange = getSelectedLineRange();
     var currentLine = getTextInRange(lnRange[0], lnRange[1]);
+    if (!currentLine.match(/ *\*/))
+    {
+        return;
+    }
     var currentCursorWidth = currentCursorPos();
     var cursor = getSelectedLineRange()[0];
     var currentBlock = getCurrentBlock(cursor);
@@ -615,6 +620,10 @@ function pushLeftBlock()
     var lnRange = getSelectedLineRange();
     var currentLine = getTextInRange(lnRange[0], lnRange[1]);
     if (!currentLine.startsWith('    '))
+    {
+        return;
+    }
+    if (!currentLine.match(/ *\*/))
     {
         return;
     }
