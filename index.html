@@ -4,7 +4,59 @@
 	<title>RouOutliner</title>
 	<script type="text/javascript">
 
+var wd = "RouOutliner\n\n";
+wd = wd + "Simplicity is the best.\n";
+wd = wd + "RouOutliner, a plain text outliner with only three features.\n";
+wd = wd + "Outliner, Checklist and Table.\n";
+wd = wd + "\n";
+wd = wd + "---\n";
+wd = wd + "\n";
+wd = wd + "* Why create this outliner?\n";
+wd = wd + "    * I (@Roulesophy) am a Drafts4 heavy user in iOS.\n";
+wd = wd + "    * I created some script in Drafts4's for outlining\n";
+wd = wd + "    * Sometimes I am not using iPad I also need to do outlining\n";
+wd = wd + "    * I really missed those functions I developed!\n";
+wd = wd + "    * Therefore, RouOutliner is out :)\n";
+wd = wd + "* Why plain text?\n";
+wd = wd + "    * Plain text is the content which can stay for longest time\n";
+wd = wd + "        * Needs specific program to open proprietary format\n";
+wd = wd + "        * What if we cannot use them?\n"; 
+wd = wd + "    * It is better to do version control\n";
+wd = wd + "* How to use this outliner? \n";
+wd = wd + "    * Organising your idea:\n";
+wd = wd + "        * Type all random thinkings in your mind here\n";
+wd = wd + "        * Use our indend function to make hierarcy\n";
+wd = wd + "            * Try Ctrl-H and Ctrl L here!\n";
+wd = wd + "        * Use our reordering function to create sequence\n";
+wd = wd + "            * Important thing comes first\n";
+wd = wd + "            * Try Ctrl-J and Ctrl K here!\n";
+wd = wd + "        * Convert the idea to action\n";
+wd = wd + "            * Insert todo for points needed\n";
+wd = wd + "            * Try Ctrl-O here! Press at least 5 times ;)\n";
+wd = wd + "    * Use table to make your idea clear\n";
+wd = wd + "        * It is hard to read the table format like the following\n";
+wd = wd + "        * Try Ctrl-T here! It will format the table ;)\n";
+wd = wd + "\n";
+wd = wd + "\n";
+wd = wd + "||Plain Text|proprietary format|\n";
+wd = wd + "|---|---|---|\n";
+wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
+wd = wd + "|Text Editor|Vim|TextEdit|\n";
+	
+	
 var maxCallCount = 999999;
+var reg1 = '1';
+var reg2 = '2';
+var reg3 = '3';
+var reg4 = '4';
+var reg5 = '5';
+var reg6 = '6';
+var reg7 = '7';
+var reg8 = '8';
+var reg9 = '9';
+var reg0 = '0';
+
+var currentReg = reg1;
 
 var textarea;
 var localStorageKey = 'content';
@@ -18,62 +70,8 @@ function init()
     textarea = document.getElementById("textarea");
     textarea.select();
 
-    var wd = "Simplicity is the best.\n";
-    wd = wd + "RouOutliner, a plain text outliner with only three features.\n";
-    wd = wd + "Outliner, Checklist and Table.\n";
-    wd = wd + "\n";
-    wd = wd + "---\n";
-    wd = wd + "\n";
-    wd = wd + "* Why create this outliner?\n";
-    wd = wd + "    * I (@Roulesophy) am a Drafts4 heavy user in iOS.\n";
-    wd = wd + "    * I created some script in Drafts4's for outlining\n";
-    wd = wd + "    * Sometimes I am not using iPad I also need to do outlining\n";
-    wd = wd + "    * I really missed those functions I developed!\n";
-    wd = wd + "    * Therefore, RouOutliner is out :)\n";
-    wd = wd + "* Why plain text?\n";
-    wd = wd + "    * Plain text is the content which can stay for longest time\n";
-    wd = wd + "        * Needs specific program to open proprietary format\n";
-    wd = wd + "        * What if we cannot use them?\n"; 
-    wd = wd + "    * It is better to do version control\n";
-    wd = wd + "* How to use this outliner? \n";
-    wd = wd + "    * Organising your idea:\n";
-    wd = wd + "        * Type all random thinkings in your mind here\n";
-    wd = wd + "        * Use our indend function to make hierarcy\n";
-    wd = wd + "            * Try Ctrl-H and Ctrl L here!\n";
-    wd = wd + "        * Use our reordering function to create sequence\n";
-    wd = wd + "            * Important thing comes first\n";
-    wd = wd + "            * Try Ctrl-J and Ctrl K here!\n";
-    wd = wd + "        * Convert the idea to action\n";
-    wd = wd + "            * Insert todo for points needed\n";
-    wd = wd + "            * Try Ctrl-O here! Press at least 5 times ;)\n";
-    wd = wd + "    * Use table to make your idea clear\n";
-    wd = wd + "        * It is hard to read the table format like the following\n";
-    wd = wd + "        * Try Ctrl-T here! It will format the table ;)\n";
-    wd = wd + "\n";
-    wd = wd + "\n";
-    wd = wd + "||Plain Text|proprietary format|\n";
-    wd = wd + "|---|---|---|\n";
-    wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
-    wd = wd + "|Text Editor|Vim|TextEdit|\n";
-
-    var localStorageItem = localStorage.getItem(localStorageKey);
-    document.getElementById("console").innerHTML = "#" + localStorageItem + "#";
-    if (localStorageItem != null)
-    {
-    	textarea.value = localStorageItem;
-    }
-    else
-    {
-    	textarea.value = wd;
-    }
-
-    textarea.addEventListener("click", function()
-    {
-        var alertTxt = '';
-        alertTxt += getCursor(textarea);
-        alertTxt += '<br>' + getSurroundingSelection(textarea);
-        document.getElementById("console").innerHTML = alertTxt;
-    });
+    
+	getRegContent();
 
     textarea.addEventListener("keydown",function(e)
     {
@@ -142,6 +140,76 @@ function init()
             e.preventDefault();
             insertPicture();
         }
+        else if (key == 49 && ctrl && shift) // ctrl 1
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg1;
+            getRegContent();
+        }
+        else if (key == 50 && ctrl && shift) // ctrl 2
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg2;
+            getRegContent();
+        }
+        else if (key == 51 && ctrl && shift) // ctrl 3
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg3;
+            getRegContent();
+        }
+        else if (key == 52 && ctrl && shift) // ctrl 4
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg4;
+            getRegContent();
+        }
+        else if (key == 53 && ctrl && shift) // ctrl 5
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg5;
+            getRegContent();
+        }
+        else if (key == 54 && ctrl && shift) // ctrl 6
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg6;
+            getRegContent();
+        }
+        else if (key == 55 && ctrl && shift) // ctrl 7
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg7;
+            getRegContent();
+        }
+        else if (key == 56 && ctrl && shift) // ctrl 8
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg8;
+            getRegContent();
+        }
+        else if (key == 57 && ctrl && shift) // ctrl 9
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg9;
+            getRegContent();
+        }
+        else if (key == 48 && ctrl && shift) // ctrl 0
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = reg0;
+            getRegContent();
+        }
         else if (key == 9 && shift) // shift tab
         {
             e.preventDefault();
@@ -191,20 +259,53 @@ function init()
         	e.preventDefault();
             //enterSpaceStarIfNeeded();
         }
+        getRegTitle();
     },false);
     setSelectedRange(0, 0);
 }
 
+function getRegTitle()
+{
+	document.title = '[' + currentReg + '] ' + textarea.value.split('\n')[0];
+}
+
+function getRegContent()
+{
+    var localStorageItem = localStorage.getItem(currentReg);
+    document.getElementById("console").innerHTML = "#" + localStorageItem + "#";
+    if (localStorageItem != null)
+    {
+    	textarea.value = localStorageItem;
+    }
+    else if (currentReg == reg1)
+    {
+    	textarea.value = wd;
+    }
+    else
+    {
+    	textarea.value = '';
+    }
+    getRegTitle();
+
+    textarea.addEventListener("click", function()
+    {
+        var alertTxt = '';
+        alertTxt += getCursor(textarea);
+        alertTxt += '<br>' + getSurroundingSelection(textarea);
+        document.getElementById("console").innerHTML = alertTxt;
+    });
+}
+
 function commitToLocalStorage()
 {
-	localStorage.setItem(localStorageKey, textarea.value);
+	localStorage.setItem(currentReg, textarea.value);
 }
 
 function removeLocalStorage()
 {
-	localStorage.removeItem(localStorageKey);
+	localStorage.removeItem(currentReg);
 	textarea.blur();
-	document.getElementById("console").innerHTML = localStorage.getItem(localStorageKey);
+	document.getElementById("console").innerHTML = localStorage.getItem(currentReg);
 }
 
 function gotoPreviousLine()
