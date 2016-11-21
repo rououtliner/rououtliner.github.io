@@ -1062,10 +1062,8 @@ function insertComment()
 	var currentLine = getSelectedLineRange();
     var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
     var starPos = getStarPos(getCursor());
-    enterTwoSpaces();
-   	enterNewLine();	
    	var currentLineSpacePos = currentLineText.search(/[^ ]/);
-    var result = "";
+    var result = "  \n";
     for (var i = 0; i < currentLineSpacePos; i++)
     {
         result += " ";
@@ -1074,8 +1072,9 @@ function insertComment()
     {
     	result += "  ";
     }
+    gotoEndOfLine();
     var cursor = getCursor();
-    setTextInRange(cursor, 0, result);
+   	setTextInRange(cursor, 0, result);
     setSelectedRange(cursor + result.length, 0);
 }
 
