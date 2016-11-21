@@ -336,10 +336,6 @@ function gotoEndOfLine()
 function shiftEnterSpaceStarIfNeeded()
 {
 	var cursor = getCursor();
-	//if (isFirstLine(cursor))
-	//{
-	//	return;
-	//}
     var lnRange = getCurrentLine(cursor);
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
     if (currentLineText.match(/^ *\* /))
@@ -387,29 +383,49 @@ function shiftEnterSpaceStarIfNeeded()
 
 function enterSpaceStarIfNeeded()
 {
-    var lnRange = getCurrentLine(getCursor());
+    //var lnRange = getCurrentLine(getCursor());
+    var lnRange = getSelectedLineRange();
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
     if (currentLineText.match(/^ *\* /))
     {
     	gotoEndOfLine();
     	var currentLineStarPos = currentLineText.indexOf('* ');
+    	
+    	var cursor = getCursor();
+    	var currentPoint = getCurrentPoint(cursor);
+        var nextLine = getNextLine(currentPoint[0] + 1);
+        if (nextLine == -1)
+        {
+        	// next line is last line
+        }
+        else
+        {
+	        var nextPointText = getTextInRange(nextLine[0], nextLine[1]);
+        	var nextPointTextStarPos = nextPointText.indexOf('* ');
+        	if (nextPointTextStarPos > currentLineStarPos)
+        	{
+        		currentLineStarPos = nextPointTextStarPos;
+        	}
+        }
+    	
+    	//currentLineStarPos = currentLineText.indexOf('* ');
         var result = "\n";
         for (var i = 0; i < currentLineStarPos; i++)
         {
             result += " ";
         }
         result += "* ";
-        var cursor = getCursor();
-        var currentBlock = getCurrentBlock(cursor);
+        
+        
         if (isLastLine(cursor))
         {
-        	setTextInRange(currentBlock[0] + currentBlock[1], 0, result);
- 	        setSelectedRange(currentBlock[0] + currentBlock[1] + result.length, 0);
+        	setTextInRange(currentPoint[0] + currentPoint[1], 0, result);
+ 	        setSelectedRange(currentPoint[0] + currentPoint[1] + result.length, 0);
         }
         else
         {
-	        setTextInRange(currentBlock[0] + currentBlock[1] - 1, 0, result);
-	        setSelectedRange(currentBlock[0] + currentBlock[1] - 1 + result.length, 0);
+	        setTextInRange(currentPoint[0] + currentPoint[1] - 1, 0, result);
+	        setSelectedRange(currentPoint[0] + currentPoint[1] - 1 + result.length, 0);
         }
     }
     else
@@ -588,7 +604,7 @@ function getCurrentLine(startCharPos)
     else
     {    startPos = startCharPos;
         var calls = 0;
-        while (startPos != 0 && getTextInRange(startPos - 1, 1) != '\n')
+        while (startPos > 0 && getTextInRange(startPos - 1, 1) != '\n')
         {
             calls += 1;
             if (calls > maxCallCount)
@@ -602,7 +618,7 @@ function getCurrentLine(startCharPos)
     var tempPos = startPos;
     var allTextLength = getText().length;
     var calls = 0;
-    while (tempPos != allTextLength && getTextInRange(tempPos, 1) != '\n')
+    while (tempPos < allTextLength && getTextInRange(tempPos, 1) != '\n')
     {
         calls += 1;
         if (calls > maxCallCount)
@@ -739,6 +755,60 @@ function getPreviousBlock(cursor)
     else
     {
         return -1;
+    }
+}
+
+// at star line use, get current point with comment
+function getCurrentPoint(cursor)
+{
+    var starPos = getStarPos(cursor);
+    var currentLine = getCurrentLine(cursor);
+    if (starPos == -1)
+    {
+        return -1;
+    }
+    if (isLastLine(cursor))
+    {
+        return currentLine;
+    }
+    var startPos = currentLine[0];
+    var found = false;
+    var calls = 0;
+    while(!found && !isLastLine(startPos))
+    {
+        calls += 1;
+        if (calls > maxCallCount)
+        {
+            alert("inf loop: getCurrentPoint()");
+            break;
+        }
+        var nextLine = getNextLine(startPos);
+        startPos = nextLine[0];
+        if (nextLine[1] == 1) // empty line
+        {
+        	startPos = getCurrentLine(startPos - 1)[0];
+        	break;
+        }
+        var currentStarPos = getStarPos(startPos);
+        if (currentStarPos >= 0)
+        {
+            found = true;
+        }
+    }
+    if (found)
+    {
+        startPos = getPreviousLine(startPos)[0];
+        var result = new Array();
+        result[0] = currentLine[0];
+        result[1] = startPos + getCurrentLine(startPos)[1] - currentLine[0];
+        return result;
+    }
+    else
+    {
+        var result = new Array();
+        result[0] = currentLine[0];
+        result[1] = startPos + getCurrentLine(startPos)[1] - currentLine[0];
+        return result;
     }
 }
 
