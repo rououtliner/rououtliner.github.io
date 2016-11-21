@@ -22,7 +22,7 @@ wd = wd + "    * Plain text is the content which can stay for longest time\n";
 wd = wd + "        * Needs specific program to open proprietary format\n";
 wd = wd + "        * What if we cannot use them?\n"; 
 wd = wd + "    * It is better to do version control\n";
-wd = wd + "* How to use this outliner? \n";
+wd = wd + "* How to use this outliner? (Ctrl-/ for more info)\n";
 wd = wd + "    * Organising your idea:\n";
 wd = wd + "        * Type all random thinkings in your mind here\n";
 wd = wd + "        * Use our indend function to make hierarcy\n";
@@ -30,7 +30,7 @@ wd = wd + "            * Try Ctrl-H and Ctrl L here!\n";
 wd = wd + "        * Use our reordering function to create sequence\n";
 wd = wd + "            * Important thing comes first\n";
 wd = wd + "            * Try Ctrl-J and Ctrl K here!\n";
-wd = wd + "        * Convert the idea to action\n";
+wd = wd + "    * Convert the idea to action\n";
 wd = wd + "            * Insert todo for points needed\n";
 wd = wd + "            * Try Ctrl-O here! Press at least 5 times ;)\n";
 wd = wd + "    * Use table to make your idea clear\n";
@@ -43,7 +43,37 @@ wd = wd + "|---|---|---|\n";
 wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
 wd = wd + "|Text Editor|Vim|TextEdit|\n";
 	
-	
+var tutorial = "";
+tutorial = tutorial + "# Help file  \n";
+tutorial = tutorial + "    \n";
+tutorial = tutorial + "   Key                 | Feature                        \n";
+tutorial = tutorial + "   ---                 | ---                            \n";
+tutorial = tutorial + "* Outlining\n";
+tutorial = tutorial + "    * Ctrl H           | Outdent a block                \n";
+tutorial = tutorial + "    * Ctrl L           | Indent a block                 \n";
+tutorial = tutorial + "    * Ctrl J           | Move down a block              \n";
+tutorial = tutorial + "    * Ctrl K           | Move up a block                \n";
+tutorial = tutorial + "    * Ctrl Shift J     | Move down a line               \n";
+tutorial = tutorial + "    * Ctrl Shift K     | Move up a line                 \n";
+tutorial = tutorial + "    * Ctrl D           | Delete                         \n";
+tutorial = tutorial + "    * Ctrl '           | toggle comment                 \n";
+tutorial = tutorial + "* Todo List\n";
+tutorial = tutorial + "    * Ctrl O           | Insert Todo, toggle finish Todo\n";
+tutorial = tutorial + "* Table\n";
+tutorial = tutorial + "    * Ctrl T           | Format table                   \n";
+tutorial = tutorial + "* Markdown editing\n";
+tutorial = tutorial + "    * Ctrl B           | Bold                           \n";
+tutorial = tutorial + "    * Ctrl I           | Italic                         \n";
+tutorial = tutorial + "    * Ctrl U           | Insert URL                     \n";
+tutorial = tutorial + "    * Ctrl P           | Insert Photo                   \n";
+tutorial = tutorial + "* Navigation\n";
+tutorial = tutorial + "    * Ctrl Shift 0-9   | Go to file 0-9                 \n";
+tutorial = tutorial + "    * Ctrl /           | Go to manual page              \n";
+tutorial = tutorial + "    * Ctrl Shift .     | Go to Homepage                 \n";
+tutorial = tutorial + "\n";
+tutorial = tutorial + "Now press Ctrl Shift <number> to your file...";
+
+
 var maxCallCount = 999999;
 var reg1 = '1';
 var reg2 = '2';
@@ -55,6 +85,8 @@ var reg7 = '7';
 var reg8 = '8';
 var reg9 = '9';
 var reg0 = '0';
+var regTut = '?';
+var regHome = '#';
 
 var currentReg = reg1;
 
@@ -220,6 +252,20 @@ function init()
             currentReg = reg0;
             getRegContent();
         }
+        else if (key == 191 && shift) // ctrl ?
+        {
+        	e.preventDefault();
+        	commitToLocalStorage();
+        	currentReg = regTut;
+        	getRegContent();
+        }
+        else if (key == 190 && shift) // ctrl .
+        {
+        	e.preventDefault();
+        	commitToLocalStorage();
+        	currentReg = regHome;
+        	getRegContent();
+        }
         else if (key == 9 && shift) // shift tab
         {
             e.preventDefault();
@@ -283,7 +329,15 @@ function getRegContent()
 {
     var localStorageItem = localStorage.getItem(currentReg);
     document.getElementById("console").innerHTML = "#" + localStorageItem + "#";
-    if (localStorageItem != null)
+    if (currentReg == regTut)
+    {
+    	textarea.value = tutorial;
+    }
+    else if (currentReg == regHome)
+    {
+    	textarea.value = wd;
+    }
+    else if (localStorageItem != null)
     {
     	textarea.value = localStorageItem;
     }
