@@ -128,7 +128,7 @@ function init()
         else if (key == 222 && ctrl) // ctrl '
         {
             e.preventDefault();
-            insertComment();
+            toggleComment();
         }
         else if (key == 66 && ctrl) // ctrl b
         {
@@ -612,7 +612,8 @@ function getCurrentLine(startCharPos)
         startPos = startCharPos;
     }
     else
-    {    startPos = startCharPos;
+    {    
+    	startPos = startCharPos;
         var calls = 0;
         while (startPos > 0 && getTextInRange(startPos - 1, 1) != '\n')
         {
@@ -1263,6 +1264,59 @@ function enterNewLine()
 	var currentLine = getSelectedLineRange();
     setTextInRange(currentLine[0] + currentLine[1], 0, '\n');
     setSelectedRange(currentLine[0] + currentLine[1], 0);
+}
+
+function toggleComment()
+{
+	var cursor = getCursor();
+	var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    if (currentLineText.match(/^ *\* /))
+    {
+    	var currentPoint = getCurrentPoint(cursor);
+    	var currentPointLine = getCurrentLine(currentPoint[0] + currentPoint[1] - 1);
+    	var currentPointLineText = getTextInRange(currentPointLine[0], currentPointLine[1]);
+    	if (currentPointLineText.match(/^ *\* /))
+    	{
+    		insertComment();
+    	}
+    	else
+    	{
+    		setSelectedRange(currentPoint[0] + currentPoint[1] - 1, 0);
+    	}
+    }
+    else
+    {
+    	var found = false;
+    	var pos = cursor;
+    	var calls = 0;
+    	while (!found && !isFirstLine(pos) && !isEmptyLine(pos))
+    	{
+    		calls += 1;
+            if (calls > maxCallCount)
+            {
+                alert("inf loop: toggleComment()");
+                break;
+            }
+    		var previousLine = getPreviousLine(pos);
+    		pos = previousLine[0];
+        	var posLineText = getTextInRange(previousLine[0], previousLine[1]);
+        	if (posLineText.match(/^ *\* /))
+        	{
+        		found = true;
+        	}
+    	}
+    	if (found){
+    		var currentPoint = getCurrentPoint(pos);
+    		var currentPointLine = getCurrentLine(currentPoint[0]);
+    		setSelectedRange(currentPointLine[0] + currentPointLine[1] - 1, 0);
+    	}
+    }
+}
+
+function isEmptyLine(cursor)
+{
+	return getCurrentLine(cursor)[1] <= 1;
 }
 
 function insertComment()
