@@ -157,7 +157,10 @@ function init()
         }
         else if (key == 13) // enter
         {
-        	gotoEndOfLine();
+        	e.preventDefault();
+        	//gotoEndOfLine();
+        	//enterNewLine();	
+        	enterSpaceStarIfNeeded();
         }
         
         if (!(ctrl && key == 81)) // not ctrl Q
@@ -183,7 +186,8 @@ function init()
         }
         else if (key == 13)
         {
-            enterSpaceStarIfNeeded();
+        	e.preventDefault();
+            //enterSpaceStarIfNeeded();
         }
     },false);
     setSelectedRange(0, 0);
@@ -264,23 +268,34 @@ function shiftEnterSpaceStarIfNeeded()
 
 function enterSpaceStarIfNeeded()
 {
-    var lnRange = getCurrentLine(getCursor() - 1);
+    var lnRange = getCurrentLine(getCursor());
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
     if (currentLineText.match(/^ *\* /))
     {
+    	gotoEndOfLine();
     	var currentLineStarPos = currentLineText.indexOf('* ');
-        var result = "";
+        var result = "\n";
         for (var i = 0; i < currentLineStarPos; i++)
         {
             result += " ";
         }
         result += "* ";
         var cursor = getCursor();
-        setTextInRange(cursor, 0, result);
-        setSelectedRange(cursor + result.length, 0);
+        var currentBlock = getCurrentBlock(cursor);
+        if (isLastLine(cursor))
+        {
+        	setTextInRange(currentBlock[0] + currentBlock[1], 0, result);
+ 	        setSelectedRange(currentBlock[0] + currentBlock[1] + result.length, 0);
+        }
+        else
+        {
+	        setTextInRange(currentBlock[0] + currentBlock[1] - 1, 0, result);
+	        setSelectedRange(currentBlock[0] + currentBlock[1] - 1 + result.length, 0);
+        }
     }
     else
     {
+    	gotoEndOfLine();
     	var currentLineSpacePos = currentLineText.search(/[^ ]/);
         var result = "";
         for (var i = 0; i < currentLineSpacePos; i++)
@@ -288,8 +303,8 @@ function enterSpaceStarIfNeeded()
             result += " ";
         }
         var cursor = getCursor();
-        setTextInRange(cursor - 1, 1, '  \n' + result);
-        setSelectedRange(cursor + 2 + result.length, 0);
+        setTextInRange(cursor, 0, '  \n' + result);
+        setSelectedRange(cursor + 3 + result.length, 0);
     }
 }
 
