@@ -85,6 +85,16 @@ function init()
             e.preventDefault();
             pushLeftBlock();
         }
+        else if (key == 74 && ctrl && shift) // ctrl shift j
+        {
+            e.preventDefault();
+            moveDown();
+        }
+        else if (key == 75 && ctrl && shift) // ctrl shift k
+        {
+            e.preventDefault();
+            moveUp();
+        }
         else if (key == 74 && ctrl) // ctrl j
         {
             e.preventDefault();
