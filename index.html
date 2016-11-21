@@ -336,10 +336,10 @@ function gotoEndOfLine()
 function shiftEnterSpaceStarIfNeeded()
 {
 	var cursor = getCursor();
-	if (isFirstLine(cursor))
-	{
-		return;
-	}
+	//if (isFirstLine(cursor))
+	//{
+	//	return;
+	//}
     var lnRange = getCurrentLine(cursor);
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
     if (currentLineText.match(/^ *\* /))
@@ -352,8 +352,16 @@ function shiftEnterSpaceStarIfNeeded()
         }
         result += "* ";
         var cursor = lnRange[0];
-        setTextInRange(cursor - 1, 0, result);
-        setSelectedRange(cursor + result.length - 1, 0);
+        if (cursor == 0)
+        {
+            setTextInRange(cursor, 0, result);
+            setSelectedRange(cursor + result.length, 0);
+        }
+        else
+        {
+	        setTextInRange(cursor - 1, 0, result);
+    	    setSelectedRange(cursor + result.length - 1, 0);
+        }
     }
     else
     {
@@ -364,8 +372,16 @@ function shiftEnterSpaceStarIfNeeded()
             result += " ";
         }
         var cursor = lnRange[0];
-        setTextInRange(cursor - 1, 0, result);
-        setSelectedRange(cursor + result.length - 1, 0);
+        if (cursor == 0)
+        {
+            setTextInRange(cursor, 0, result);
+            setSelectedRange(cursor + result.length, 0);
+        }
+        else
+        {
+	        setTextInRange(cursor - 1, 0, result);
+	        setSelectedRange(cursor + result.length - 1, 0);
+        }
     }
 }
 
