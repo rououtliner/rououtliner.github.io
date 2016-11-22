@@ -312,8 +312,6 @@ function init()
         else if (key == 13) // enter
         {
             e.preventDefault();
-            //gotoEndOfLine();
-            //enterNewLine();
             enterSpaceStarIfNeeded();
         }
 
@@ -334,6 +332,10 @@ function init()
         var key = e.which || e.keyCode; // keyCode detection
         var ctrl = e.ctrlKey ? e.ctrlKey : ((key === 17) ? true : false); // ctrl detection
         var shift = e.shiftKey ? e.shiftKey : ((key === 16) ? true : false); // alt detection
+        if (key == 13 && ctrl) // ctrl + enter
+        {
+            e.preventDefault();
+        }
         if (key == 13 && shift) // shift + enter
         {
             e.preventDefault();
