@@ -58,6 +58,9 @@ tutorial = tutorial + "    * Ctrl Shift J     | Move down a line               \
 tutorial = tutorial + "    * Ctrl Shift K     | Move up a line                 \n";
 tutorial = tutorial + "    * Ctrl D           | Delete                         \n";
 tutorial = tutorial + "    * Ctrl '           | toggle comment                 \n";
+tutorial = tutorial + "    * Enter            | Enter next point               \n";
+tutorial = tutorial + "    * Ctrl Enter       | Enter next sub point           \n";
+tutorial = tutorial + "    * Ctrl Shift Enter | Enter point before             \n";
 tutorial = tutorial + "* Todo List\n";
 tutorial = tutorial + "    * Ctrl O           | Insert Todo, toggle finish Todo\n";
 tutorial = tutorial + "* Table\n";
@@ -294,6 +297,11 @@ function init()
             e.preventDefault();
             shiftEnterSpaceStarIfNeeded();
         }
+        else if (key == 13 && ctrl)
+        {
+            e.preventDefault();
+            enterSpaceStarIfNeededForSubPoint();
+        }
         else if (key == 13) // enter
         {
             e.preventDefault();
@@ -517,6 +525,53 @@ function enterSpaceStarIfNeeded()
         //currentLineStarPos = currentLineText.indexOf('* ');
         var result = "\n";
         for (var i = 0; i < currentLineStarPos; i++)
+        {
+            result += " ";
+        }
+        result += "* ";
+
+
+        if (isLastLine(cursor))
+        {
+            setTextInRange(currentPoint[0] + currentPoint[1], 0, result);
+             setSelectedRange(currentPoint[0] + currentPoint[1] + result.length, 0);
+        }
+        else
+        {
+            setTextInRange(currentPoint[0] + currentPoint[1] - 1, 0, result);
+            setSelectedRange(currentPoint[0] + currentPoint[1] - 1 + result.length, 0);
+        }
+    }
+    else
+    {
+        gotoEndOfLine();
+        var currentLineSpacePos = currentLineText.search(/[^ ]/);
+        var result = "";
+        for (var i = 0; i < currentLineSpacePos; i++)
+        {
+            result += " ";
+        }
+        var cursor = getCursor();
+        setTextInRange(cursor, 0, '  \n' + result);
+        setSelectedRange(cursor + 3 + result.length, 0);
+    }
+}
+
+function enterSpaceStarIfNeededForSubPoint()
+{
+    //var lnRange = getCurrentLine(getCursor());
+    var lnRange = getSelectedLineRange();
+    var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
+    if (currentLineText.match(/^ *\* /))
+    {
+        gotoEndOfLine();
+        var currentLineStarPos = currentLineText.indexOf('* ');
+
+        var cursor = getCursor();
+        var currentPoint = getCurrentPoint(cursor);
+
+        var result = "\n";
+        for (var i = 0; i < currentLineStarPos + 4; i++)
         {
             result += " ";
         }
