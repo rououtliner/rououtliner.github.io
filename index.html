@@ -21,7 +21,7 @@ wd = wd + "    * Therefore, RouOutliner is out :)\n";
 wd = wd + "* Why plain text?\n";
 wd = wd + "    * Plain text is the content which can stay for longest time\n";
 wd = wd + "        * Needs specific program to open proprietary format\n";
-wd = wd + "        * What if we cannot use them?\n"; 
+wd = wd + "        * What if we cannot use them?\n";
 wd = wd + "    * It is better to do version control\n";
 wd = wd + "* How to use this outliner? (Ctrl-/ for more info)\n";
 wd = wd + "    * Organising your idea:\n";
@@ -43,7 +43,7 @@ wd = wd + "||Plain Text|proprietary format|\n";
 wd = wd + "|---|---|---|\n";
 wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
 wd = wd + "|Text Editor|Vim|TextEdit|\n";
-    
+
 var tutorial = "";
 tutorial = tutorial + "# Help file  \n";
 tutorial = tutorial + "    \n";
@@ -69,7 +69,8 @@ tutorial = tutorial + "    * Ctrl U           | Insert URL                     \
 tutorial = tutorial + "    * Ctrl P           | Insert Photo                   \n";
 tutorial = tutorial + "* Navigation\n";
 tutorial = tutorial + "    * Ctrl Shift 0-9   | Go to file 0-9                 \n";
-tutorial = tutorial + "    * Ctrl /           | Go to manual page              \n";
+tutorial = tutorial + "    * Ctrl Shift /     | Go to manual page              \n";
+tutorial = tutorial + "    * Ctrl Shift ,     | Go to Index                    \n";
 tutorial = tutorial + "    * Ctrl Shift .     | Go to Homepage                 \n";
 tutorial = tutorial + "\n";
 tutorial = tutorial + "Now press Ctrl Shift <number> to your file...";
@@ -88,6 +89,7 @@ var reg9 = '9';
 var reg0 = '0';
 var regTut = '?';
 var regHome = '#';
+var regIndex = '!';
 
 var currentReg = reg1;
 
@@ -252,18 +254,25 @@ function init()
             currentReg = reg0;
             getRegContent();
         }
-        else if (key == 191 && shift) // ctrl ?
+        else if (key == 191 && ctrl && shift) // ctrl ?
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = regTut;
             getRegContent();
         }
-        else if (key == 190 && shift) // ctrl .
+        else if (key == 190 && ctrl && shift) // ctrl .
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = regHome;
+            getRegContent();
+        }
+        else if (key == 188 && ctrl && shift) // ctrl ,
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = regIndex;
             getRegContent();
         }
         else if (key == 9 && shift) // shift tab
@@ -285,10 +294,10 @@ function init()
         {
             e.preventDefault();
             //gotoEndOfLine();
-            //enterNewLine();    
+            //enterNewLine();
             enterSpaceStarIfNeeded();
         }
-        
+
         if (!(ctrl && key == 81)) // not ctrl Q
         {
             commitToLocalStorage();
@@ -325,6 +334,19 @@ function getRegTitle()
     document.title = '[' + currentReg + '] ' + textarea.value.split('\n')[0];
 }
 
+function getTitleOfNotes(reg)
+{
+	var content = localStorage.getItem(reg);
+	if (content == null)
+	{
+		return '';
+	}
+	else
+	{
+		return content.split('\n')[0];
+	}
+}
+
 function getRegContent()
 {
     var localStorageItem = localStorage.getItem(currentReg);
@@ -336,6 +358,22 @@ function getRegContent()
     else if (currentReg == regHome)
     {
         textarea.value = wd;
+    }
+    else if (currentReg == regIndex)
+    {
+    	var content = 'Index:\n\n';
+    	content = content + '* [' + reg1 + '] ' + getTitleOfNotes(reg1) + '\n';
+    	content = content + '* [' + reg2 + '] ' + getTitleOfNotes(reg2) + '\n';
+    	content = content + '* [' + reg3 + '] ' + getTitleOfNotes(reg3) + '\n';
+    	content = content + '* [' + reg4 + '] ' + getTitleOfNotes(reg4) + '\n';
+    	content = content + '* [' + reg5 + '] ' + getTitleOfNotes(reg5) + '\n';
+    	content = content + '* [' + reg6 + '] ' + getTitleOfNotes(reg6) + '\n';
+    	content = content + '* [' + reg7 + '] ' + getTitleOfNotes(reg7) + '\n';
+    	content = content + '* [' + reg8 + '] ' + getTitleOfNotes(reg8) + '\n';
+    	content = content + '* [' + reg9 + '] ' + getTitleOfNotes(reg9) + '\n';
+    	content = content + '* [' + reg0 + '] ' + getTitleOfNotes(reg0);
+
+    	textarea.value = content;
     }
     else if (localStorageItem != null)
     {
@@ -454,7 +492,7 @@ function enterSpaceStarIfNeeded()
     {
         gotoEndOfLine();
         var currentLineStarPos = currentLineText.indexOf('* ');
-        
+
         var cursor = getCursor();
         var currentPoint = getCurrentPoint(cursor);
         var nextLine = getNextLine(currentPoint[0] + 1);
@@ -471,7 +509,7 @@ function enterSpaceStarIfNeeded()
                 currentLineStarPos = nextPointTextStarPos;
             }
         }
-        
+
         //currentLineStarPos = currentLineText.indexOf('* ');
         var result = "\n";
         for (var i = 0; i < currentLineStarPos; i++)
@@ -479,8 +517,8 @@ function enterSpaceStarIfNeeded()
             result += " ";
         }
         result += "* ";
-        
-        
+
+
         if (isLastLine(cursor))
         {
             setTextInRange(currentPoint[0] + currentPoint[1], 0, result);
@@ -545,14 +583,14 @@ function setTextInRange(start, length, string)
 {
     // Replace the text in the specified range with the value of string.
     var text = string;
-    
+
     // method 1
     //textarea.value = textarea.value.substring(0, start) + string + textarea.value.substring(start + length, textarea.value.length);
-    
+
     // method 2
     setSelectedRange(start, length);
     document.execCommand('insertText', false, text);
-    
+
     // method 3
     //var event = document.createEvent('TextEvent');
     //setSelectedRange(start, length);
@@ -666,7 +704,7 @@ function getCurrentLine(startCharPos)
         startPos = startCharPos;
     }
     else
-    {    
+    {
         startPos = startCharPos;
         var calls = 0;
         while (startPos > 0 && getTextInRange(startPos - 1, 1) != '\n')
@@ -1061,7 +1099,7 @@ function pushRightBlock()
         moveRight();
     }
     else
-    {    
+    {
         var currentCursorWidth = currentCursorPos();
         var cursor = getSelectedLineRange()[0];
         var currentBlock = getCurrentBlock(cursor);
@@ -1300,7 +1338,7 @@ function deleteElement()
         setSelectedRange(currentLine[0], 0);
     }
     else
-    {    
+    {
         var currentBlock = getCurrentBlock(cursor);
         setTextInRange(currentBlock[0], currentBlock[1], '');
         setSelectedRange(currentBlock[0], 0);
@@ -1633,7 +1671,7 @@ function test()
 
     alert(alertTxt);
 }
-    </script>    
+    </script>
 </head>
 
 <body>
