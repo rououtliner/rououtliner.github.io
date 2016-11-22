@@ -35,14 +35,15 @@ wd = wd + "    * Convert the idea to action\n";
 wd = wd + "            * Insert todo for points needed\n";
 wd = wd + "            * Try Ctrl-O here! Press at least 5 times ;)\n";
 wd = wd + "    * Use table to make your idea clear\n";
+wd = wd + "        * Press Ctrl-\ to add column\n";
 wd = wd + "        * It is hard to read the table format like the following\n";
 wd = wd + "        * Try Ctrl-T here! It will format the table ;)\n";
 wd = wd + "\n";
 wd = wd + "\n";
-wd = wd + "||Plain Text|proprietary format|\n";
-wd = wd + "|---|---|---|\n";
-wd = wd + "|Outliner|RouOutliner|OmniOutliner|\n";
-wd = wd + "|Text Editor|Vim|TextEdit|\n";
+wd = wd + " |  | Plain Text | proprietary format | \n";
+wd = wd + " | --- | --- | --- | \n";
+wd = wd + " | Outliner | RouOutliner | OmniOutliner | \n";
+wd = wd + " | Text Editor | Vim | TextEdit | \n";
 
 var tutorial = "";
 tutorial = tutorial + "# Help file  \n";
@@ -64,6 +65,7 @@ tutorial = tutorial + "    * Ctrl Shift Enter | Enter point before             \
 tutorial = tutorial + "* Todo List\n";
 tutorial = tutorial + "    * Ctrl O           | Insert Todo, toggle finish Todo\n";
 tutorial = tutorial + "* Table\n";
+tutorial = tutorial + "    * Ctrl \           | Insert table column            \n";
 tutorial = tutorial + "    * Ctrl T           | Format table                   \n";
 tutorial = tutorial + "* Markdown editing\n";
 tutorial = tutorial + "    * Ctrl B           | Bold                           \n";
@@ -189,6 +191,11 @@ function init()
         }
         else if (key == 83 && ctrl) // ctrl s, disable save action
         {
+            e.preventDefault();
+        }
+        else if (key == 220 && ctrl) // ctrl s, disable save action
+        {
+        	insertTableDelimiter();
             e.preventDefault();
         }
         else if (key == 49 && ctrl && shift) // ctrl 1
@@ -752,6 +759,11 @@ function getAfterCursorSelection()
 function getCursor()
 {
     return getSelectedRange()[0];
+}
+
+function insertTableDelimiter()
+{
+	setTextInRange(getCursor(), 0, ' | ');
 }
 
 function getCurrentLine(startCharPos)
@@ -1588,7 +1600,7 @@ function table()
     var colNum = 1;
     for (i = 0; i < rowNum; i++)
     {
-        var currentLineColNum = lineData[i].split('|').length;
+        var currentLineColNum = lineData[i].split(' | ').length;
         if (currentLineColNum > colNum)
         {
             colNum = currentLineColNum;
@@ -1612,7 +1624,7 @@ function table()
     // find whether the row should be tableize for each row and put to array[row]
     for (var i = 0; i < rowNum; i++)
     {
-        if (lineData[i].split('|').length == 1)
+        if (lineData[i].split(' | ').length < colNum)
         {
             shouldTableize[i] = false;
         }
@@ -1626,11 +1638,11 @@ function table()
     // put split data to the data array[row][col]
     for (var i = 0; i < rowNum; i++)
     {
-        var colData = lineData[i].split('|');
+        var colData = lineData[i].split(' | ');
         var colLength = colData.length;
         for (var j = 0; j < colLength; j++)
         {
-            data[i][j] = colData[j];
+            data[i][j] = colData[j].replace(/\s*$/,"");;
             alertTxt = alertTxt + '\n' + data[i][j];
         }
     }
@@ -1678,7 +1690,7 @@ function table()
     {
         if (shouldTableize[i])
         {
-            finalLineData[i] = data[i].join('|');
+            finalLineData[i] = data[i].join(' | ');
         }
         else
         {
