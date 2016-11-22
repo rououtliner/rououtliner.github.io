@@ -184,6 +184,10 @@ function init()
             e.preventDefault();
             insertPicture();
         }
+        else if (key == 83 && ctrl) // ctrl s, disable save action
+        {
+            e.preventDefault();
+        }
         else if (key == 49 && ctrl && shift) // ctrl 1
         {
             e.preventDefault();
