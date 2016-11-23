@@ -64,7 +64,7 @@ tutorial = tutorial + "    * Enter            | Enter next point               \
 tutorial = tutorial + "    * Ctrl Enter       | Enter next sub point           \n";
 tutorial = tutorial + "    * Ctrl Shift Enter | Enter point before             \n";
 tutorial = tutorial + "* Todo List\n";
-tutorial = tutorial + "    * Ctrl O           | Insert Todo, toggle finish Todo\n";
+tutorial = tutorial + "    * Ctrl O           | Insert todo, toggle finish todo\n";
 tutorial = tutorial + "* Table\n";
 tutorial = tutorial + "    * Ctrl \           | Insert table column            \n";
 tutorial = tutorial + "    * Ctrl T           | Format table                   \n";
@@ -72,15 +72,19 @@ tutorial = tutorial + "* Markdown editing\n";
 tutorial = tutorial + "    * Ctrl B           | Bold                           \n";
 tutorial = tutorial + "    * Ctrl I           | Italic                         \n";
 tutorial = tutorial + "    * Ctrl U           | Insert URL                     \n";
-tutorial = tutorial + "    * Ctrl P           | Insert Photo                   \n";
+tutorial = tutorial + "    * Ctrl P           | Insert picture                 \n";
+tutorial = tutorial + "* View\n";
+tutorial = tutorial + "    * Ctrl =           | Increase font size             \n";
+tutorial = tutorial + "    * Ctrl -           | Decrease font size             \n";
 tutorial = tutorial + "* Navigation\n";
 tutorial = tutorial + "    * Ctrl Shift 0-9   | Go to file 0-9                 \n";
 tutorial = tutorial + "    * Ctrl Shift /     | Go to manual page              \n";
 tutorial = tutorial + "    * Ctrl Shift ,     | Go to Index                    \n";
-tutorial = tutorial + "    * Ctrl Shift .     | Go to Homepage                 \n";
+tutorial = tutorial + "    * Ctrl Shift .     | Go to homepage                 \n";
 tutorial = tutorial + "\n";
 tutorial = tutorial + "Now press Ctrl Shift <number> to your file...";
 
+var fontSize = 14;
 
 var maxCallCount = 999999;
 var reg1 = '1';
@@ -110,6 +114,8 @@ function init()
 {
     textarea = document.getElementById("textarea");
     textarea.select();
+
+	displayFontSize();
 
     getRegContent();
 
@@ -203,6 +209,16 @@ function init()
         {
         	insertTableDelimiter();
             e.preventDefault();
+        }
+        else if (key == 187 && ctrl) // ctrl =
+        {
+            e.preventDefault();
+        	increaseFontSize();
+        }
+        else if (key == 189 && ctrl) // ctrl -
+        {
+            e.preventDefault();
+        	decreaseFontSize();
         }
         else if (key == 49 && ctrl && shift) // ctrl 1
         {
@@ -354,6 +370,23 @@ function init()
         getRegTitle();
     },false);
     setSelectedRange(0, 0);
+}
+
+function increaseFontSize()
+{
+	fontSize = fontSize + 2;
+	displayFontSize();
+}
+
+function decreaseFontSize()
+{
+	fontSize = fontSize - 2;
+	displayFontSize();
+}
+
+function displayFontSize()
+{
+	textarea.style.fontSize = fontSize + "px";
 }
 
 function getRegTitle()
@@ -1770,7 +1803,7 @@ function test()
 </head>
 
 <body>
-    <textarea id="textarea" style="width:100%; height:100%;font-family: monospace;font-size:14px"></textarea>
+    <textarea id="textarea" style="width:100%; height:100%;font-family: monospace;"></textarea>
     <div id="console" hidden></div>
 </body>
 </html>
