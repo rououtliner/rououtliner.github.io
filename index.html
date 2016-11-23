@@ -37,7 +37,7 @@ wd = wd + "            * Try Ctrl-O here! Press at least 5 times ;)\n";
 wd = wd + "    * Use table to make your idea clear\n";
 wd = wd + "        * Press Ctrl-\ to add column\n";
 wd = wd + "        * It is hard to read the table format like the following\n";
-wd = wd + "        * Try Ctrl-T here! It will format the table ;)\n";
+wd = wd + "        * Try Ctrl-; here! It will format the table ;)\n";
 wd = wd + "\n";
 wd = wd + "\n";
 wd = wd + " |  | Plain Text | proprietary format | \n";
@@ -67,7 +67,7 @@ tutorial = tutorial + "* Todo List\n";
 tutorial = tutorial + "    * Ctrl O           | Insert todo, toggle finish todo\n";
 tutorial = tutorial + "* Table\n";
 tutorial = tutorial + "    * Ctrl \           | Insert table column            \n";
-tutorial = tutorial + "    * Ctrl T           | Format table                   \n";
+tutorial = tutorial + "    * Ctrl ;           | Format table                   \n";
 tutorial = tutorial + "* Markdown editing\n";
 tutorial = tutorial + "    * Ctrl B           | Bold                           \n";
 tutorial = tutorial + "    * Ctrl I           | Italic                         \n";
@@ -161,7 +161,7 @@ function init()
             e.preventDefault();
             handleCheckBox();
         }
-        else if (key == 84 && ctrl) // ctrl t
+        else if (key == 186 && ctrl) // ctrl ;
         {
             e.preventDefault();
             table();
@@ -1766,6 +1766,7 @@ function table()
     else
     {
         setTextInRange(selectedRange[0], selectedRange[1], finalText);
+        setSelectedRange(selectedRange[0], finalText.length);
     }
 }
 
