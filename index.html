@@ -58,6 +58,7 @@ tutorial = tutorial + "    * Ctrl K           | Move up a block                \
 tutorial = tutorial + "    * Ctrl Shift J     | Move down a line               \n";
 tutorial = tutorial + "    * Ctrl Shift K     | Move up a line                 \n";
 tutorial = tutorial + "    * Ctrl D           | Delete                         \n";
+tutorial = tutorial + "    * Ctrl E           | Empty line content             \n";
 tutorial = tutorial + "    * Ctrl '           | Toggle comment                 \n";
 tutorial = tutorial + "    * Ctrl R           | Find and replace               \n";
 tutorial = tutorial + "    * Enter            | Enter next point               \n";
@@ -219,6 +220,11 @@ function init()
         {
             e.preventDefault();
         	decreaseFontSize();
+        }
+        else if (key == 69 && ctrl) // ctrl e
+        {
+            e.preventDefault();
+            emptyLine();
         }
         else if (key == 49 && ctrl && shift) // ctrl 1
         {
@@ -468,6 +474,23 @@ function removeLocalStorage()
     localStorage.removeItem(currentReg);
     textarea.blur();
     document.getElementById("console").innerHTML = localStorage.getItem(currentReg);
+}
+
+
+function emptyLine()
+{
+	var lnRange = getSelectedLineRange();
+    var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
+    if (currentLineText.endsWith("\n"))
+    {
+    	setTextInRange(lnRange[0], lnRange[1], "\n");
+    	setSelectedRange(lnRange[0], 0);
+    }
+    else
+    {
+        setTextInRange(lnRange[0], lnRange[1], "");
+    	setSelectedRange(lnRange[0] + 1, 0);
+    }
 }
 
 function gotoPreviousLine()
