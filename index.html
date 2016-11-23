@@ -538,6 +538,176 @@ function removeLocalStorage()
     document.getElementById("console").innerHTML = localStorage.getItem(currentReg);
 }
 
+//------------------------------------------------------------------------------------------
+// Drafts function
+
+function getText()
+{
+    // returns the full text currently being edited
+    return textarea.value;
+}
+
+function setText(string)
+{
+    // replaces full text being edited with string
+    textarea.value = string;
+}
+
+function getSelectedText()
+{
+    // return only the selected text. If no text selection exists, this will return an empty string.
+    return getMiddleCursorSelection();
+}
+
+function setSelectedText(string)
+{
+    // Replace only the current selected text range with the string. Also updates the selected range to match any change in length of the new string.
+    textarea.value = getBeforeCursorSelection() + string + getAfterCursorSelection();
+}
+
+function getTextInRange(start, length)
+{
+
+    // Return text in the request range.
+    return textarea.value.substring(start, start + length);
+}
+
+function setTextInRange(start, length, string)
+{
+    // Replace the text in the specified range with the value of string.
+    var text = string;
+
+    // method 1
+    //textarea.value = textarea.value.substring(0, start) + string + textarea.value.substring(start + length, textarea.value.length);
+
+    // method 2
+    setSelectedRange(start, length);
+    document.execCommand('insertText', false, text);
+
+    // method 3
+    //var event = document.createEvent('TextEvent');
+    //setSelectedRange(start, length);
+    //event.initTextEvent('textInput', true, true, null, text || "\0");
+    //textarea.dispatchEvent(event); // fire the event on the the textarea
+}
+function getSelectedLineRange()
+{
+    // Returns the range (start,length) of the full line based on the current cursor position
+    return getCurrentLine(getCursor());
+}
+function getSelectedRange()
+{
+    // Returns the current selected text range as an array with values [start, length].
+    var result = new Array();
+    result[0] = textarea.selectionStart;
+    result[1] = textarea.selectionEnd - textarea.selectionStart;
+    return result;
+}
+function setSelectedRange(start, length)
+{
+    // Set the selected range of text. Invalid ranges will be automatically adjusted, and this text selection will be applied after successful completion of the script.
+    setSelectionRange(start, start + length);
+}
+function getClipboard()
+{
+    // Returns current contents of the system clipboard.
+    // Not supported yet
+}
+function setClipboard(string)
+{
+
+    // Set the system clipboard to the string passed.
+    // Not supported yet
+}
+function markdown(string, useXHTML)
+{
+
+    // runs the string through the Markdown processor returning HTML.
+    // Not supported yet
+}
+function encodeHTMLEntities(string)
+{
+    // Encodes the string to HTML safe entities, e.g. converting & to &amp;
+    // Not supported yet
+}
+function decodeHTMLEntities(string)
+{
+    //Decodes HTML entities.
+    // Not supported yet
+}
+
+//---------------------------------------------------------------------------------------------------
+// Drafts adapter function
+
+function setSelectionRange(selectionStart, selectionEnd)
+{
+    if (textarea.setSelectionRange)
+    {
+        textarea.focus();
+        textarea.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (textarea.createTextRange)
+    {
+        var range = textarea.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+}
+
+function setCaretToPos(pos)
+{
+    setSelectionRange(pos, pos);
+}
+
+function getSurroundingSelection()
+{
+    return [textarea.value.substring(0, textarea.selectionStart)
+        ,textarea.value.substring(textarea.selectionStart, textarea.selectionEnd)
+        ,textarea.value.substring(textarea.selectionEnd, textarea.value.length)]
+}
+function getBeforeCursorSelection()
+{
+    return textarea.value.substring(0, textarea.selectionStart);
+}
+function getMiddleCursorSelection()
+{
+    return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+}
+function getAfterCursorSelection()
+{
+    return textarea.value.substring(textarea.selectionEnd, textarea.value.length);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Self function
+function replace()
+{
+	var reStr = prompt("Please enter find with words", "");
+	if (reStr == null ||reStr == "")
+	{
+		return;
+	}
+	var re = new RegExp(reStr, "g");
+	var replaceStr = prompt("Please enter word to replace '" + reStr + "'", "");
+	var text = getText();
+	if (replaceStr == null)
+	{
+		return;
+	}
+	setTextInRange(0, text.length, text.replace(re, replaceStr));
+}
+
+function getCursor()
+{
+    return getSelectedRange()[0];
+}
+
+function insertTableDelimiter()
+{
+	setTextInRange(getCursor(), 0, ' | ');
+}
 
 function emptyLine()
 {
@@ -729,177 +899,6 @@ function enterSpaceStarIfNeededForSubPoint()
         setTextInRange(cursor, 0, '  \n' + result);
         setSelectedRange(cursor + 3 + result.length, 0);
     }
-}
-
-//------------------------------------------------------------------------------------------
-// Drafts function
-
-function getText()
-{
-    // returns the full text currently being edited
-    return textarea.value;
-}
-
-function setText(string)
-{
-    // replaces full text being edited with string
-    textarea.value = string;
-}
-
-function getSelectedText()
-{
-    // return only the selected text. If no text selection exists, this will return an empty string.
-    return getMiddleCursorSelection();
-}
-
-function setSelectedText(string)
-{
-    // Replace only the current selected text range with the string. Also updates the selected range to match any change in length of the new string.
-    textarea.value = getBeforeCursorSelection() + string + getAfterCursorSelection();
-}
-
-function getTextInRange(start, length)
-{
-
-    // Return text in the request range.
-    return textarea.value.substring(start, start + length);
-}
-
-function setTextInRange(start, length, string)
-{
-    // Replace the text in the specified range with the value of string.
-    var text = string;
-
-    // method 1
-    //textarea.value = textarea.value.substring(0, start) + string + textarea.value.substring(start + length, textarea.value.length);
-
-    // method 2
-    setSelectedRange(start, length);
-    document.execCommand('insertText', false, text);
-
-    // method 3
-    //var event = document.createEvent('TextEvent');
-    //setSelectedRange(start, length);
-    //event.initTextEvent('textInput', true, true, null, text || "\0");
-    //textarea.dispatchEvent(event); // fire the event on the the textarea
-}
-function getSelectedLineRange()
-{
-    // Returns the range (start,length) of the full line based on the current cursor position
-    return getCurrentLine(getCursor());
-}
-function getSelectedRange()
-{
-    // Returns the current selected text range as an array with values [start, length].
-    var result = new Array();
-    result[0] = textarea.selectionStart;
-    result[1] = textarea.selectionEnd - textarea.selectionStart;
-    return result;
-}
-function setSelectedRange(start, length)
-{
-    // Set the selected range of text. Invalid ranges will be automatically adjusted, and this text selection will be applied after successful completion of the script.
-    setSelectionRange(start, start + length);
-}
-function getClipboard()
-{
-    // Returns current contents of the system clipboard.
-    // Not supported yet
-}
-function setClipboard(string)
-{
-
-    // Set the system clipboard to the string passed.
-    // Not supported yet
-}
-function markdown(string, useXHTML)
-{
-
-    // runs the string through the Markdown processor returning HTML.
-    // Not supported yet
-}
-function encodeHTMLEntities(string)
-{
-    // Encodes the string to HTML safe entities, e.g. converting & to &amp;
-    // Not supported yet
-}
-function decodeHTMLEntities(string)
-{
-    //Decodes HTML entities.
-    // Not supported yet
-}
-
-//---------------------------------------------------------------------------------------------------
-// Drafts adapter function
-
-function setSelectionRange(selectionStart, selectionEnd)
-{
-    if (textarea.setSelectionRange)
-    {
-        textarea.focus();
-        textarea.setSelectionRange(selectionStart, selectionEnd);
-    }
-    else if (textarea.createTextRange)
-    {
-        var range = textarea.createTextRange();
-        range.collapse(true);
-        range.moveEnd('character', selectionEnd);
-        range.moveStart('character', selectionStart);
-        range.select();
-    }
-}
-
-function setCaretToPos(pos)
-{
-    setSelectionRange(pos, pos);
-}
-
-function getSurroundingSelection()
-{
-    return [textarea.value.substring(0, textarea.selectionStart)
-        ,textarea.value.substring(textarea.selectionStart, textarea.selectionEnd)
-        ,textarea.value.substring(textarea.selectionEnd, textarea.value.length)]
-}
-function getBeforeCursorSelection()
-{
-    return textarea.value.substring(0, textarea.selectionStart);
-}
-function getMiddleCursorSelection()
-{
-    return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-}
-function getAfterCursorSelection()
-{
-    return textarea.value.substring(textarea.selectionEnd, textarea.value.length);
-}
-
-//-------------------------------------------------------------------------------------------------
-// Self function
-function replace()
-{
-	var reStr = prompt("Please enter find with words", "");
-	if (reStr == null ||reStr == "")
-	{
-		return;
-	}
-	var re = new RegExp(reStr, "g");
-	var replaceStr = prompt("Please enter word to replace '" + reStr + "'", "");
-	var text = getText();
-	if (replaceStr == null)
-	{
-		return;
-	}
-	setTextInRange(0, text.length, text.replace(re, replaceStr));
-}
-
-function getCursor()
-{
-    return getSelectedRange()[0];
-}
-
-function insertTableDelimiter()
-{
-	setTextInRange(getCursor(), 0, ' | ');
 }
 
 function getCurrentLine(startCharPos)
