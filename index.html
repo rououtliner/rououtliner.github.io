@@ -189,6 +189,11 @@ function init()
             e.preventDefault();
             pushRightBlock();
         }
+        else if (key == 79 && ctrl && shift) // ctrl shift o
+        {
+            e.preventDefault();
+            nonPointsTodo();
+        }
         else if (key == 79 && ctrl) // ctrl o
         {
             e.preventDefault();
@@ -258,91 +263,91 @@ function init()
             e.preventDefault();
             emptyLine();
         }
-        else if (key == 49 && ctrl && shift) // ctrl 1
+        else if (key == 49 && ctrl && shift) // ctrl shift 1
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg1;
             getRegContent();
         }
-        else if (key == 50 && ctrl && shift) // ctrl 2
+        else if (key == 50 && ctrl && shift) // ctrl shift 2
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg2;
             getRegContent();
         }
-        else if (key == 51 && ctrl && shift) // ctrl 3
+        else if (key == 51 && ctrl && shift) // ctrl shift 3
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg3;
             getRegContent();
         }
-        else if (key == 52 && ctrl && shift) // ctrl 4
+        else if (key == 52 && ctrl && shift) // ctrl shift 4
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg4;
             getRegContent();
         }
-        else if (key == 53 && ctrl && shift) // ctrl 5
+        else if (key == 53 && ctrl && shift) // ctrl shift 5
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg5;
             getRegContent();
         }
-        else if (key == 54 && ctrl && shift) // ctrl 6
+        else if (key == 54 && ctrl && shift) // ctrl shift 6
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg6;
             getRegContent();
         }
-        else if (key == 55 && ctrl && shift) // ctrl 7
+        else if (key == 55 && ctrl && shift) // ctrl shift 7
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg7;
             getRegContent();
         }
-        else if (key == 56 && ctrl && shift) // ctrl 8
+        else if (key == 56 && ctrl && shift) // ctrl shift 8
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg8;
             getRegContent();
         }
-        else if (key == 57 && ctrl && shift) // ctrl 9
+        else if (key == 57 && ctrl && shift) // ctrl shift 9
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg9;
             getRegContent();
         }
-        else if (key == 48 && ctrl && shift) // ctrl 0
+        else if (key == 48 && ctrl && shift) // ctrl shift 0
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = reg0;
             getRegContent();
         }
-        else if (key == 191 && ctrl && shift) // ctrl ?
+        else if (key == 191 && ctrl && shift) // ctrl shift ?
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = regTut;
             getRegContent();
         }
-        else if (key == 190 && ctrl && shift) // ctrl .
+        else if (key == 190 && ctrl && shift) // ctrl shift .
         {
             e.preventDefault();
             commitToLocalStorage();
             currentReg = regHome;
             getRegContent();
         }
-        else if (key == 188 && ctrl && shift) // ctrl ,
+        else if (key == 188 && ctrl && shift) // ctrl shift ,
         {
             e.preventDefault();
             commitToLocalStorage();
@@ -683,6 +688,66 @@ function getAfterCursorSelection()
 
 //-------------------------------------------------------------------------------------------------
 // Self function
+
+function nonPointsTodo()
+{
+	var cursor = getCursor();
+	var todoNotDone1 = getTextInRange(cursor, 4) == "[ ] ";
+	var todoNotDone2 = getTextInRange(cursor - 1, 4) == "[ ] ";
+	var todoNotDone3 = getTextInRange(cursor - 2, 4) == "[ ] ";
+	var todoNotDone4 = getTextInRange(cursor - 3, 4) == "[ ] ";
+	var todoDone1 = getTextInRange(cursor, 4) == "[x] ";
+	var todoDone2 = getTextInRange(cursor - 1, 4) == "[x] ";
+	var todoDone3 = getTextInRange(cursor - 2, 4) == "[x] ";
+	var todoDone4 = getTextInRange(cursor - 3, 4) == "[x] ";
+	if (todoNotDone1)
+	{
+		setTextInRange(cursor, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone2)
+	{
+		setTextInRange(cursor - 1, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone3)
+	{
+		setTextInRange(cursor - 2, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone4)
+	{
+		setTextInRange(cursor - 3, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone1)
+	{
+		setTextInRange(cursor, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone2)
+	{
+		setTextInRange(cursor - 1, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone3)
+	{
+		setTextInRange(cursor - 2, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone4)
+	{
+		setTextInRange(cursor - 3, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else 
+	{
+		setTextInRange(cursor, 0, "[ ] ");
+		setSelectedRange(cursor + 4, 0);
+	}
+}
+
+
 function replace()
 {
 	var reStr = prompt("Please enter find with words", "");
