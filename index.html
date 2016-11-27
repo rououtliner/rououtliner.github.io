@@ -868,7 +868,87 @@ function enterSpaceStarIfNeeded()
 {
     var lnRange = getSelectedLineRange();
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
-    if (currentLineText.match(/^ *\* /))
+    if (currentLineText.match(/^ *\* \[ \] /))
+    {
+        gotoEndOfLine();
+        var currentLineStarPos = currentLineText.indexOf('* [ ] ');
+
+        var cursor = getCursor();
+        var currentPoint = getCurrentPoint(cursor);
+        var nextLine = getNextLine(currentPoint[0] + 1);
+        if (nextLine == -1)
+        {
+            // next line is last line
+        }
+        else
+        {
+            var nextPointText = getTextInRange(nextLine[0], nextLine[1]);
+            var nextPointTextStarPos = nextPointText.indexOf('* ');
+            if (nextPointTextStarPos > currentLineStarPos)
+            {
+                currentLineStarPos = nextPointTextStarPos;
+            }
+        }
+
+        var result = "\n";
+        for (var i = 0; i < currentLineStarPos; i++)
+        {
+            result += " ";
+        }
+        result += "* [ ] ";
+
+        if (isLastLine(cursor))
+        {
+            setTextInRange(currentPoint[0] + currentPoint[1], 0, result);
+             setSelectedRange(currentPoint[0] + currentPoint[1] + result.length, 0);
+        }
+        else
+        {
+            setTextInRange(currentPoint[0] + currentPoint[1] - 1, 0, result);
+            setSelectedRange(currentPoint[0] + currentPoint[1] - 1 + result.length, 0);
+        }
+    }
+    if (currentLineText.match(/^ *\* \[x\] /))
+    {
+        gotoEndOfLine();
+        var currentLineStarPos = currentLineText.indexOf('* [x] ');
+
+        var cursor = getCursor();
+        var currentPoint = getCurrentPoint(cursor);
+        var nextLine = getNextLine(currentPoint[0] + 1);
+        if (nextLine == -1)
+        {
+            // next line is last line
+        }
+        else
+        {
+            var nextPointText = getTextInRange(nextLine[0], nextLine[1]);
+            var nextPointTextStarPos = nextPointText.indexOf('* ');
+            if (nextPointTextStarPos > currentLineStarPos)
+            {
+                currentLineStarPos = nextPointTextStarPos;
+            }
+        }
+
+        var result = "\n";
+        for (var i = 0; i < currentLineStarPos; i++)
+        {
+            result += " ";
+        }
+        result += "* [ ] ";
+
+        if (isLastLine(cursor))
+        {
+            setTextInRange(currentPoint[0] + currentPoint[1], 0, result);
+             setSelectedRange(currentPoint[0] + currentPoint[1] + result.length, 0);
+        }
+        else
+        {
+            setTextInRange(currentPoint[0] + currentPoint[1] - 1, 0, result);
+            setSelectedRange(currentPoint[0] + currentPoint[1] - 1 + result.length, 0);
+        }
+    }
+    else if (currentLineText.match(/^ *\* /))
     {
         gotoEndOfLine();
         var currentLineStarPos = currentLineText.indexOf('* ');
