@@ -25,4 +25,4 @@ To Organize, to Clarify and to Action.
         * Use our reordering function to create sequence
     * Use table to make your idea clear
     * Convert the idea to action
-            * Insert todo for points needed
+        * Insert todo for points needed
