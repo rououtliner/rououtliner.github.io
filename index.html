@@ -114,6 +114,7 @@ var reg0 = '0';
 var regTut = '?';
 var regHome = '#';
 var regIndex = '!';
+var regTodo = '`';
 
 
 var currentReg = reg1;
@@ -333,6 +334,13 @@ function init()
             currentReg = reg0;
             getRegContent();
         }
+	else if (key == 192 && ctrl && shift) // ctrl shift `
+        {
+            e.preventDefault();
+            commitToLocalStorage();
+            currentReg = regTodo;
+            getRegContent();
+        }
         else if (key == 191 && ctrl && shift) // ctrl shift ?
         {
             e.preventDefault();
@@ -496,6 +504,7 @@ function getRegContent()
     else if (currentReg == regIndex)
     {
     	var content = 'Index:\n\n';
+	content = content + '* [' + regTodo + '] ' + getTitleOfNotes(regTodo) + '\n';
     	content = content + '* [' + reg1 + '] ' + getTitleOfNotes(reg1) + '\n';
     	content = content + '* [' + reg2 + '] ' + getTitleOfNotes(reg2) + '\n';
     	content = content + '* [' + reg3 + '] ' + getTitleOfNotes(reg3) + '\n';
