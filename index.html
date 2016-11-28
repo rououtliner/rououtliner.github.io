@@ -59,6 +59,8 @@ tutorial = tutorial + "    * Ctrl H           | Outdent a block                \
 tutorial = tutorial + "    * Ctrl L           | Indent a block                 \n";
 tutorial = tutorial + "    * Ctrl J           | Move down a block              \n";
 tutorial = tutorial + "    * Ctrl K           | Move up a block                \n";
+tutorial = tutorial + "    * Ctrl Shift H     | Move left a line               \n";
+tutorial = tutorial + "    * Ctrl Shift L     | Move right a line              \n";
 tutorial = tutorial + "    * Ctrl Shift J     | Move down a line               \n";
 tutorial = tutorial + "    * Ctrl Shift K     | Move up a line                 \n";
 tutorial = tutorial + "    * Ctrl D           | Delete                         \n";
@@ -160,7 +162,17 @@ function init()
         var ctrl = e.ctrlKey ? e.ctrlKey : ((key === 17) ? true : false); // ctrl detection
         var alt = e.altKey ? e.altKey : ((key === 18) ? true : false); // alt detection
         var shift = e.shiftKey ? e.shiftKey : ((key === 16) ? true : false); // alt detection
-        if (key == 72 && ctrl) // ctrl h
+        if (key == 72 && ctrl && shift) // ctrl shift h
+        {
+            e.preventDefault();
+            moveLeft();
+        }
+        else if (key == 76 && ctrl && shift) // ctrl shift l
+        {
+            e.preventDefault();
+            moveRight();
+        }
+        else if (key == 72 && ctrl) // ctrl h
         {
             e.preventDefault();
             pushLeftBlock();
@@ -1596,31 +1608,80 @@ function handleCheckBox()
 
 function moveLeft()
 {
-    var lnRange = getSelectedLineRange();
-    var currentLineStart = lnRange[0];
-    var currentLineLength = lnRange[1];
-    var currentCursorPos = getSelectedRange()[0];
-
-    var currentLineContent = getTextInRange(currentLineStart, currentLineLength);
-    currentLineContent = currentLineContent.replace(/^    /, '');
-
-    setTextInRange(currentLineStart, currentLineLength, currentLineContent);
-    setSelectedRange(currentCursorPos - 4, 0);
+	var lnRange = getSelectedRange();
+	var startRange = getCurrentLine(lnRange[0]);
+	var endRange = getCurrentLine(lnRange[0] + lnRange[1]);
+	var startPos = startRange[0];
+	var contentLength = 0;
+	if (getTextInRange(endRange[1] + endRange[0] - 1, 1) == "\n")
+	{
+		contentLength = endRange[1] + endRange[0] - startRange[0] - 1;
+	}
+	else
+	{
+		contentLength = endRange[1] + endRange[0] - startRange[0];
+	}
+	var content = getTextInRange(startPos, contentLength);
+	var contentLines = content.split("\n");
+	var replacedSpace = 0;
+	var regex = /^    /;
+	for (var i = 0; i < contentLines.length; i++)
+	{
+		var replaced = contentLines[i].search(regex) >= 0;
+		if(replaced){
+			contentLines[i] = contentLines[i].replace(regex, '');
+			replacedSpace = replacedSpace + 4;
+		}
+	}
+	var resultContent = contentLines.join("\n");
+	setTextInRange(startPos, contentLength, resultContent);
+	if (lnRange[1] > 0) {
+		setSelectedRange(startPos, contentLength - replacedSpace);		
+	}
+	else
+	{
+		setSelectedRange(lnRange[0] - 4, 0);
+	}
 }
 
 
 function moveRight()
 {
-    var lnRange = getSelectedLineRange();
-    var currentLineStart = lnRange[0];
-    var currentLineLength = lnRange[1];
-    var currentCursorPos = getSelectedRange()[0];
-
-    var currentLineContent = getTextInRange(currentLineStart, currentLineLength);
-    currentLineContent = currentLineContent.replace(/^/, '    ');
-
-    setTextInRange(currentLineStart, currentLineLength, currentLineContent);
-    setSelectedRange(currentCursorPos + 4, 0);
+	var lnRange = getSelectedRange();
+	var startRange = getCurrentLine(lnRange[0]);
+	var endRange = getCurrentLine(lnRange[0] + lnRange[1]);
+	var startPos = startRange[0];
+	var contentLength = 0;
+	if (getTextInRange(endRange[1] + endRange[0] - 1, 1) == "\n")
+	{
+		contentLength = endRange[1] + endRange[0] - startRange[0] - 1;
+	}
+	else
+	{
+		contentLength = endRange[1] + endRange[0] - startRange[0];
+	}
+	var content = getTextInRange(startPos, contentLength);
+	var contentLines = content.split("\n");
+	var replacedSpace = 0;
+	var regex = /^/;
+	for (var i = 0; i < contentLines.length; i++)
+	{
+		var replaced = contentLines[i].search(regex) >= 0;
+		if(replaced){
+		    //newStr = newStr.replace(regex, '!');
+			contentLines[i] = contentLines[i].replace(regex, '    ');
+			replacedSpace = replacedSpace + 4;
+		}
+	}
+	var resultContent = contentLines.join("\n");
+	setTextInRange(startPos, contentLength, resultContent);
+	if (lnRange[1] > 0) {
+		setSelectedRange(startPos, contentLength + replacedSpace);		
+	}
+	else
+	{
+		setSelectedRange(lnRange[0] + 4, 0);
+	}
 }
 
 
