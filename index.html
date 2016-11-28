@@ -908,7 +908,7 @@ function enterSpaceStarIfNeeded()
             setSelectedRange(currentPoint[0] + currentPoint[1] - 1 + result.length, 0);
         }
     }
-    if (currentLineText.match(/^ *\* \[x\] /))
+    else if (currentLineText.match(/^ *\* \[x\] /))
     {
         gotoEndOfLine();
         var currentLineStarPos = currentLineText.indexOf('* [x] ');
