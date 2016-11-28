@@ -1687,11 +1687,13 @@ function moveRight()
 
 function moveUp()
 {
-    var lnRange = getSelectedLineRange();
-    var currentLineStart = lnRange[0];
-    var currentLineLength = lnRange[1];
+	var lnRange = getSelectedRange();
+	var startRange = getCurrentLine(lnRange[0]);
+	var endRange = getCurrentLine(lnRange[0] + lnRange[1]);
+	var startPos = startRange[0];
+	var currentLineStart = startRange[0];
+	var currentLineLength = endRange[1] + endRange[0] - startRange[0];
     var cursorOffset = getSelectedRange()[0] - currentLineStart;
-
     if (currentLineStart != 0)
     {
         var startCharPos = currentLineStart - 2;
@@ -1712,16 +1714,18 @@ function moveUp()
             currentLineContent = currentLineContent + '\n';
         }
         setTextInRange(prevLineStart, prevLineLength + currentLineLength, currentLineContent + prevLineContent);
-        setSelectedRange(prevLineStart + cursorOffset,0)
+        setSelectedRange(prevLineStart + cursorOffset, lnRange[1])
     }
 }
 
 function moveDown()
 {
-    var lnRange = getSelectedLineRange();
-    var currentLineStart = lnRange[0];
-    var currentLineLength = lnRange[1];
-
+	var lnRange = getSelectedRange();
+	var startRange = getCurrentLine(lnRange[0]);
+	var endRange = getCurrentLine(lnRange[0] + lnRange[1]);
+	var startPos = startRange[0];
+	var currentLineStart = startRange[0];
+	var currentLineLength = endRange[1] + endRange[0] - startRange[0];
     var cursorOffset = getSelectedRange()[0] - currentLineStart;
     var allTextLength = getText().length;
     if (currentLineStart + currentLineLength != allTextLength) // last line
@@ -1744,7 +1748,7 @@ function moveDown()
             nextLineContent = nextLineContent + '\n'
         }
         setTextInRange(currentLineStart, currentLineLength + nextLineLength, nextLineContent + currentLineContent);
-        setSelectedRange(currentLineStart + nextLineLength + cursorOffset, 0)
+        setSelectedRange(currentLineStart + nextLineLength + cursorOffset, lnRange[1])
     }
 }
 
