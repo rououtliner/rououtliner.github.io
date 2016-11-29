@@ -214,6 +214,16 @@ function init()
             e.preventDefault();
             handleCheckBox();
         }
+        else if (key == 221 && ctrl && shift) // ctrl shift ]
+        {
+            e.preventDefault();
+            toggleRightNonPointsCheckBox();
+        }
+        else if (key == 219 && ctrl && shift) // ctrl shift [
+        {
+            e.preventDefault();
+            toggleLeftNonPointsCheckBox();
+        }
         else if (key == 221 && ctrl) // ctrl ]
         {
             e.preventDefault();
@@ -721,6 +731,265 @@ function getAfterCursorSelection()
 
 //-------------------------------------------------------------------------------------------------
 // Self function
+function toggleRightNonPointsCheckBox()
+{
+	var cursor = getCursor();
+	var todoNotDone1 = getTextInRange(cursor, 4) == "[ ] ";
+	var todoNotDone2 = getTextInRange(cursor - 1, 4) == "[ ] ";
+	var todoNotDone3 = getTextInRange(cursor - 2, 4) == "[ ] ";
+	var todoNotDone4 = getTextInRange(cursor - 3, 4) == "[ ] ";
+	var todoDone1 = getTextInRange(cursor, 4) == "[x] ";
+	var todoDone2 = getTextInRange(cursor - 1, 4) == "[x] ";
+	var todoDone3 = getTextInRange(cursor - 2, 4) == "[x] ";
+	var todoDone4 = getTextInRange(cursor - 3, 4) == "[x] ";
+	var todoWaitingFor1 = getTextInRange(cursor, 4) == "[w] ";
+	var todoWaitingFor2 = getTextInRange(cursor - 1, 4) == "[w] ";
+	var todoWaitingFor3 = getTextInRange(cursor - 2, 4) == "[w] ";
+	var todoWaitingFor4 = getTextInRange(cursor - 3, 4) == "[w] ";
+	var todoInProgress1 = getTextInRange(cursor, 4) == "[p] ";
+	var todoInProgress2 = getTextInRange(cursor - 1, 4) == "[p] ";
+	var todoInProgress3 = getTextInRange(cursor - 2, 4) == "[p] ";
+	var todoInProgress4 = getTextInRange(cursor - 3, 4) == "[p] ";
+	var todoDropped1 = getTextInRange(cursor, 4) == "[d] ";
+	var todoDropped2 = getTextInRange(cursor - 1, 4) == "[d] ";
+	var todoDropped3 = getTextInRange(cursor - 2, 4) == "[d] ";
+	var todoDropped4 = getTextInRange(cursor - 3, 4) == "[d] ";
+	if (todoNotDone1)
+	{
+		setTextInRange(cursor, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone2)
+	{
+		setTextInRange(cursor - 1, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone3)
+	{
+		setTextInRange(cursor - 2, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone4)
+	{
+		setTextInRange(cursor - 3, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone1)
+	{
+		setTextInRange(cursor, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone2)
+	{
+		setTextInRange(cursor - 1, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone3)
+	{
+		setTextInRange(cursor - 2, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone4)
+	{
+		setTextInRange(cursor - 3, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor1)
+	{
+		setTextInRange(cursor, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor2)
+	{
+		setTextInRange(cursor - 1, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor3)
+	{
+		setTextInRange(cursor - 2, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor4)
+	{
+		setTextInRange(cursor - 3, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress1)
+	{
+		setTextInRange(cursor, 4, "[d] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress2)
+	{
+		setTextInRange(cursor - 1, 4, "[d] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress3)
+	{
+		setTextInRange(cursor - 2, 4, "[d] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress4)
+	{
+		setTextInRange(cursor - 3, 4, "[d] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDropped1)
+	{
+		setTextInRange(cursor, 4, "");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDropped2)
+	{
+		setTextInRange(cursor - 1, 4, "");
+		setSelectedRange(cursor - 1, 0);
+	}
+	else if (todoDropped3)
+	{
+		setTextInRange(cursor - 2, 4, "");
+		setSelectedRange(cursor - 2, 0);
+	}
+	else if (todoDropped4)
+	{
+		setTextInRange(cursor - 3, 4, "");
+		setSelectedRange(cursor - 3, 0);
+	}
+	else 
+	{
+		setTextInRange(cursor, 0, "[ ] ");
+		setSelectedRange(cursor + 4, 0);
+	}
+}
+
+function toggleLeftNonPointsCheckBox()
+{
+	var cursor = getCursor();
+	var todoNotDone1 = getTextInRange(cursor, 4) == "[ ] ";
+	var todoNotDone2 = getTextInRange(cursor - 1, 4) == "[ ] ";
+	var todoNotDone3 = getTextInRange(cursor - 2, 4) == "[ ] ";
+	var todoNotDone4 = getTextInRange(cursor - 3, 4) == "[ ] ";
+	var todoDone1 = getTextInRange(cursor, 4) == "[x] ";
+	var todoDone2 = getTextInRange(cursor - 1, 4) == "[x] ";
+	var todoDone3 = getTextInRange(cursor - 2, 4) == "[x] ";
+	var todoDone4 = getTextInRange(cursor - 3, 4) == "[x] ";
+	var todoWaitingFor1 = getTextInRange(cursor, 4) == "[w] ";
+	var todoWaitingFor2 = getTextInRange(cursor - 1, 4) == "[w] ";
+	var todoWaitingFor3 = getTextInRange(cursor - 2, 4) == "[w] ";
+	var todoWaitingFor4 = getTextInRange(cursor - 3, 4) == "[w] ";
+	var todoInProgress1 = getTextInRange(cursor, 4) == "[p] ";
+	var todoInProgress2 = getTextInRange(cursor - 1, 4) == "[p] ";
+	var todoInProgress3 = getTextInRange(cursor - 2, 4) == "[p] ";
+	var todoInProgress4 = getTextInRange(cursor - 3, 4) == "[p] ";
+	var todoDropped1 = getTextInRange(cursor, 4) == "[d] ";
+	var todoDropped2 = getTextInRange(cursor - 1, 4) == "[d] ";
+	var todoDropped3 = getTextInRange(cursor - 2, 4) == "[d] ";
+	var todoDropped4 = getTextInRange(cursor - 3, 4) == "[d] ";
+	if (todoNotDone1)
+	{
+		setTextInRange(cursor, 4, "");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoNotDone2)
+	{
+		setTextInRange(cursor - 1, 4, "");
+		setSelectedRange(cursor - 1, 0);
+	}
+	else if (todoNotDone3)
+	{
+		setTextInRange(cursor - 2, 4, "");
+		setSelectedRange(cursor - 2, 0);
+	}
+	else if (todoNotDone4)
+	{
+		setTextInRange(cursor - 3, 4, "");
+		setSelectedRange(cursor - 3, 0);
+	}
+	else if (todoDone1)
+	{
+		setTextInRange(cursor, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone2)
+	{
+		setTextInRange(cursor - 1, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone3)
+	{
+		setTextInRange(cursor - 2, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDone4)
+	{
+		setTextInRange(cursor - 3, 4, "[ ] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor1)
+	{
+		setTextInRange(cursor, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor2)
+	{
+		setTextInRange(cursor - 1, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor3)
+	{
+		setTextInRange(cursor - 2, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoWaitingFor4)
+	{
+		setTextInRange(cursor - 3, 4, "[x] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress1)
+	{
+		setTextInRange(cursor, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress2)
+	{
+		setTextInRange(cursor - 1, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress3)
+	{
+		setTextInRange(cursor - 2, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoInProgress4)
+	{
+		setTextInRange(cursor - 3, 4, "[w] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDropped1)
+	{
+		setTextInRange(cursor, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDropped2)
+	{
+		setTextInRange(cursor - 1, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDropped3)
+	{
+		setTextInRange(cursor - 2, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else if (todoDropped4)
+	{
+		setTextInRange(cursor - 3, 4, "[p] ");
+		setSelectedRange(cursor, 0);
+	}
+	else 
+	{
+		setTextInRange(cursor, 0, "[d] ");
+		setSelectedRange(cursor + 4, 0);
+	}
+}
 
 function nonPointsTodo()
 {
