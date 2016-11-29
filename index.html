@@ -72,6 +72,8 @@ tutorial = tutorial + "    * Ctrl Enter       | Enter next sub point           \
 tutorial = tutorial + "    * Ctrl Shift Enter | Enter point before             \n";
 tutorial = tutorial + "* Todo List\n";
 tutorial = tutorial + "    * Ctrl O           | Insert todo, toggle finish todo\n";
+tutorial = tutorial + "    * Ctrl ]           | Toggle todo status             \n";
+tutorial = tutorial + "    * Ctrl [           | Toggle todo status reverse     \n";
 tutorial = tutorial + "* Table\n";
 tutorial = tutorial + "    * Ctrl \           | Insert table column            \n";
 tutorial = tutorial + "    * Ctrl ;           | Format table                   \n";
@@ -211,6 +213,16 @@ function init()
         {
             e.preventDefault();
             handleCheckBox();
+        }
+        else if (key == 221 && ctrl) // ctrl ]
+        {
+            e.preventDefault();
+            toggleRightCheckBox();
+        }
+        else if (key == 219 && ctrl) // ctrl [
+        {
+            e.preventDefault();
+            toggleLeftCheckBox();
         }
         else if (key == 186 && ctrl) // ctrl ;
         {
@@ -1573,12 +1585,118 @@ function insertCheckBox(cursor)
     setSelectedRange(currentRange[0] + 4, 0);
 }
 
+function toggleRightCheckBox()
+{
+	var range = getSelectedRange();
+	if (range[1] >= 1)
+	{
+		return;
+	}
+	var cursor = range[0];
+    var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    var notChecked = /\* \[ \] /;
+    var checked    = /\* \[x\] /;
+    var waitingFor = /\* \[w\] /;
+    var inProgress = /\* \[p\] /;
+    var dropped    = /\* \[d\] /;
+    var noTodo     = /\* /;
+    if (currentLineText.match(notChecked))
+    {
+        currentLineText = currentLineText.replace(notChecked, '* [x] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(checked))
+    {
+        currentLineText = currentLineText.replace(checked, '* [w] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(waitingFor))
+    {
+        currentLineText = currentLineText.replace(waitingFor, '* [p] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(inProgress))
+    {
+        currentLineText = currentLineText.replace(inProgress, '* [d] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(dropped))
+    {
+    	currentLineText = currentLineText.replace(dropped, '* ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor - 4, 0);
+    }
+    else if (currentLineText.match(noTodo))
+    {
+    	insertCheckBox(cursor);
+    }
+}
+
+function toggleLeftCheckBox()
+{
+	var range = getSelectedRange();
+	if (range[1] >= 1)
+	{
+		return;
+	}
+	var cursor = range[0];
+    var currentLine = getCurrentLine(cursor);
+    var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
+    var notChecked = /\* \[ \] /;
+    var checked    = /\* \[x\] /;
+    var waitingFor = /\* \[w\] /;
+    var inProgress = /\* \[p\] /;
+    var dropped    = /\* \[d\] /;
+    var noTodo     = /\* /;
+    if (currentLineText.match(notChecked))
+    {
+    	currentLineText = currentLineText.replace(notChecked, '* ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor - 4, 0);
+    }
+    else if (currentLineText.match(checked))
+    {
+    	currentLineText = currentLineText.replace(checked, '* [ ] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(waitingFor))
+    {
+    	currentLineText = currentLineText.replace(waitingFor, '* [x] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(inProgress))
+    {
+    	currentLineText = currentLineText.replace(inProgress, '* [w] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(dropped))
+    {
+    	currentLineText = currentLineText.replace(dropped, '* [p] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+    else if (currentLineText.match(noTodo))
+    {
+    	currentLineText = currentLineText.replace(noTodo, '* [d] ');
+        setTextInRange(currentLine[0], currentLine[1], currentLineText);
+        setSelectedRange(cursor, 0);
+    }
+}
+
 function toggleCheckBox(cursor)
 {
     var currentLine = getCurrentLine(cursor);
     var currentLineText = getTextInRange(currentLine[0], currentLine[1]);
     var notChecked = /\* \[ \] /;
-    var checked = /\* \[x\] /;
+    var checked    = /\* \[x\] /;
     if (currentLineText.match(notChecked))
     {
         currentLineText = currentLineText.replace(notChecked, '* [x] ');
