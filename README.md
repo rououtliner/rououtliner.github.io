@@ -1,8 +1,8 @@
 # RouOutliner
 
-Simplicity is the best.
-RouOutliner, a plain text outliner with only three features.
-Outliner, Table and Checklist.
+Simplicity is the best.  
+RouOutliner, a plain text outliner with only three features.  
+Outliner, Table and Checklist.  
 To Organize, to Clarify and to Action.
 
 ---
