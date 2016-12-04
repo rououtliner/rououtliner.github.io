@@ -1123,45 +1123,100 @@ function shiftEnterSpaceStarIfNeeded()
     var cursor = getCursor();
     var lnRange = getCurrentLine(cursor);
     var currentLineText = getTextInRange(lnRange[0], lnRange[1]);
-    if (currentLineText.match(/^ *\* /))
+/*     if (isFirstLine(cursor))
+    {
+    	if (currentLineText.match(/^ *\* /))
+    	{
+    		
+    	}
+    	else
+    	{
+    		
+    	}
+    }
+    else  */if (currentLineText.match(/^ *\* /))
     {
         var currentLineStarPos = currentLineText.indexOf('* ');
-        var result = "\n";
+        var result = "";
+        if (!isFirstLine(cursor))
+        {
+        	result = result + "\n";	
+        }
         for (var i = 0; i < currentLineStarPos; i++)
         {
             result += " ";
         }
         result += "* ";
+        if (isFirstLine(cursor))
+        {
+        	result = result + "\n";	
+        }
         var cursor = lnRange[0];
-        if (cursor == 0)
+        if(cursor == 0)
         {
             setTextInRange(cursor, 0, result);
-            setSelectedRange(cursor + result.length, 0);
+            if (isFirstLine(cursor))
+            {
+                setSelectedRange(cursor + result.length - 1, 0);
+            }
+            else
+            {
+            	setSelectedRange(cursor + result.length, 0);
+            }
         }
         else
         {
             setTextInRange(cursor - 1, 0, result);
-            setSelectedRange(cursor + result.length - 1, 0);
+            if (isFirstLine(cursor))
+            {
+                setSelectedRange(cursor + result.length - 2, 0);
+            }
+            else
+            {
+            	setSelectedRange(cursor + result.length - 1, 0);
+            }
         }
     }
     else
     {
         var currentLineSpacePos = currentLineText.search(/[^ ]/);
-        var result = "\n";
+        var result = "";
+        if (!isFirstLine(cursor))
+        {
+        	result = result + "\n";	
+        }
         for (var i = 0; i < currentLineSpacePos; i++)
         {
             result += " ";
+        }
+        if (isFirstLine(cursor))
+        {
+        	result = result + "\n";	
         }
         var cursor = lnRange[0];
         if (cursor == 0)
         {
             setTextInRange(cursor, 0, result);
-            setSelectedRange(cursor + result.length, 0);
+            if (isFirstLine(cursor))
+            {
+            	setSelectedRange(cursor + result.length - 1, 0);
+            }
+            else
+            {
+            	setSelectedRange(cursor + result.length, 0);
+            }
         }
         else
         {
             setTextInRange(cursor - 1, 0, result);
-            setSelectedRange(cursor + result.length - 1, 0);
+            if (isFirstLine(cursor))
+            {
+            	setSelectedRange(cursor + result.length - 2, 0);
+            }
+            else
+            {
+            	setSelectedRange(cursor + result.length - 1, 0);
+            }
         }
     }
 }
