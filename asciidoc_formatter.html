@@ -1,0 +1,445 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="apple-touch-icon" sizes="120x120" href="https://github.com/rououtliner/rououtliner.github.io/blob/master/RouOutliner.png?raw=true">
+
+    
+    <title>Asciidoc formatter</title>
+    <script type="text/javascript">
+	
+	var textarea;
+var markdown;
+var localStorageKey = 'content';
+window.onload = init;
+
+function init()
+{
+    textarea = document.getElementById("textarea");
+    markdown = document.getElementById("markdown");
+    
+    markdown.style.display = 'none';
+    textarea.style.display = '';
+
+	//displayFontSize();
+	textarea.style.fontSize = 14 + "px";
+
+    //getRegContent();
+    
+
+    textarea.select();
+    setSelectedRange(0, 0);
+}
+
+function table()
+{
+    var alertTxt = '';
+
+    // grab all content
+    var text = '';
+    var selectedRange = getSelectedRange();
+    var selectedMode = (selectedRange[1] == 0);
+    if (selectedMode)
+    {
+        text = getText();
+    }
+    else
+    {
+        text = getSelectedText();
+    }
+
+    // get max column number
+    var lineData = text.split('\n')
+        var rowNum = lineData.length;
+    var colNum = 1;
+    for (i = 0; i < rowNum; i++)
+    {
+        var currentLineColNum = lineData[i].split('|').length;
+        if (currentLineColNum > colNum)
+        {
+            colNum = currentLineColNum;
+        }
+    }
+    alertTxt = alertTxt + '\nColNum=' + colNum;
+
+    // create data array[row][col] to place data, data[row][col]
+    var data = new Array(rowNum);
+    for (var i = 0; i < rowNum; i++)
+    {
+        data[i] = new Array(colNum);
+    }
+
+    // create array[col] to record column max length, maxLength[col]
+    var colMaxLength = new Array(colNum);
+
+    // create array[row] to record whether it should be tableize (boolean) shouldTableize[row]
+    var shouldTableize = new Array(rowNum);
+
+    // find whether the row should be tableize for each row and put to array[row]
+    for (var i = 0; i < rowNum; i++)
+    {
+        if (lineData[i].split('|').length < colNum)
+        {
+            shouldTableize[i] = false;
+        }
+        else
+        {
+            shouldTableize[i] = true;
+        }
+        alertTxt = alertTxt + '\nRow ' + i + '=' + shouldTableize[i];
+    }
+
+    // put split data to the data array[row][col]
+    for (var i = 0; i < rowNum; i++)
+    {
+        var colData = lineData[i].split('|');
+        var colLength = colData.length;
+        for (var j = 0; j < colLength; j++)
+        {
+            data[i][j] = colData[j].replace(/\s*$/,"");;
+            alertTxt = alertTxt + '\n' + data[i][j];
+        }
+    }
+
+    // calculate and put max length of column to array[col], need to skip array[row] = false
+    for (var j = 0; j < colNum; j++)
+    {
+        eachColMaxLength = 0;
+        for (var i = 0; i < rowNum; i++)
+        {
+            if (shouldTableize[i] && data[i][j] != undefined)
+            {
+                var dataLength = String(data[i][j]).length;
+                alertTxt = alertTxt + '\n' + dataLength;
+                if (dataLength > eachColMaxLength)
+                {
+                    eachColMaxLength = dataLength;
+                }
+            }
+        }
+        colMaxLength[j] = eachColMaxLength;
+        alertTxt = alertTxt + '\nCol ' + j + '=' + colMaxLength[j];
+    }
+
+
+    // enrich spaces for each cell
+    for (var i = 0; i < rowNum; i++)
+    {
+        if (shouldTableize[i])
+        {
+            for (var j = 0; j < colNum; j++)
+            {
+                var spaceNum = colMaxLength[j] - String(data[i][j]).length;
+                for (var spaceCount = 0; spaceCount < spaceNum; spaceCount++)
+                {
+                    data[i][j] = data[i][j] + ' ';
+                }
+            }
+        }
+    }
+
+    // join the array
+    var finalLineData = new Array(rowNum);
+    var isMarkdownTable = true;
+    for(var i = 0; i < rowNum; i++)
+    {
+        if (shouldTableize[i])
+        {
+            finalLineData[i] = data[i].join('     |');
+            //if (!finalLineData[i].startsWith('|'))
+            //{
+            //	isMarkdownTable = false;
+            //}
+        }
+        else
+        {
+            finalLineData[i] = data[i][0];
+        }
+    }
+//    if (isMarkdownTable)
+//    {
+//	    for(var i = 0; i < rowNum; i++)
+//	    {
+//	        if (shouldTableize[i])
+//	        {
+//            	finalLineData[i] = finalLineData[i].substring(1, finalLineData[i].length-1);
+//	        }
+//	    }
+//    }
+	for(var i = 0; i < rowNum; i++)
+	{
+		finalLineData[i] = '    |' + finalLineData[i];
+	}
+    var finalText = finalLineData.join('\n');
+
+
+    // replace with selected data
+    //alertTxt = alertTxt + '\n' + finalText;
+    if (selectedMode)
+    {
+        setTextInRange(0, text.length, finalText);
+    }
+    else
+    {
+        setTextInRange(selectedRange[0], selectedRange[1], finalText);
+        setSelectedRange(selectedRange[0], finalText.length);
+    }
+}
+
+//------------------------------------------------------------------------------------------
+// Drafts function
+
+function getText()
+{
+    // returns the full text currently being edited
+    return textarea.value;
+}
+
+function setText(string)
+{
+    // replaces full text being edited with string
+    textarea.value = string;
+}
+
+function getSelectedText()
+{
+    // return only the selected text. If no text selection exists, this will return an empty string.
+    return getMiddleCursorSelection();
+}
+
+function setSelectedText(string)
+{
+    // Replace only the current selected text range with the string. Also updates the selected range to match any change in length of the new string.
+    textarea.value = getBeforeCursorSelection() + string + getAfterCursorSelection();
+}
+
+function getTextInRange(start, length)
+{
+
+    // Return text in the request range.
+    return textarea.value.substring(start, start + length);
+}
+
+function setTextInRange(start, length, string)
+{
+    // Replace the text in the specified range with the value of string.
+    var text = string;
+
+    // method 1
+    //textarea.value = textarea.value.substring(0, start) + string + textarea.value.substring(start + length, textarea.value.length);
+
+    // method 2
+    setSelectedRange(start, length);
+    document.execCommand('insertText', false, text);
+
+    // method 3
+    //var event = document.createEvent('TextEvent');
+    //setSelectedRange(start, length);
+    //event.initTextEvent('textInput', true, true, null, text || "\0");
+    //textarea.dispatchEvent(event); // fire the event on the the textarea
+}
+function getSelectedLineRange()
+{
+    // Returns the range (start,length) of the full line based on the current cursor position
+    return getCurrentLine(getCursor());
+}
+function getSelectedRange()
+{
+    // Returns the current selected text range as an array with values [start, length].
+    var result = new Array();
+    result[0] = textarea.selectionStart;
+    result[1] = textarea.selectionEnd - textarea.selectionStart;
+    return result;
+}
+function setSelectedRange(start, length)
+{
+    // Set the selected range of text. Invalid ranges will be automatically adjusted, and this text selection will be applied after successful completion of the script.
+    setSelectionRange(start, start + length);
+}
+function getClipboard()
+{
+    // Returns current contents of the system clipboard.
+    // Not supported yet
+}
+function setClipboard(string)
+{
+
+    // Set the system clipboard to the string passed.
+    // Not supported yet
+}
+function markdown(string, useXHTML)
+{
+
+    // runs the string through the Markdown processor returning HTML.
+    // Not supported yet
+}
+function encodeHTMLEntities(string)
+{
+    // Encodes the string to HTML safe entities, e.g. converting & to &amp;
+    // Not supported yet
+}
+function decodeHTMLEntities(string)
+{
+    //Decodes HTML entities.
+    // Not supported yet
+}
+
+//---------------------------------------------------------------------------------------------------
+// Drafts adapter function
+
+function setSelectionRange(selectionStart, selectionEnd)
+{
+    if (textarea.setSelectionRange)
+    {
+        textarea.focus();
+        textarea.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (textarea.createTextRange)
+    {
+        var range = textarea.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+}
+
+function setCaretToPos(pos)
+{
+    setSelectionRange(pos, pos);
+}
+
+function getSurroundingSelection()
+{
+    return [textarea.value.substring(0, textarea.selectionStart)
+        ,textarea.value.substring(textarea.selectionStart, textarea.selectionEnd)
+        ,textarea.value.substring(textarea.selectionEnd, textarea.value.length)]
+}
+function getBeforeCursorSelection()
+{
+    return textarea.value.substring(0, textarea.selectionStart);
+}
+function getMiddleCursorSelection()
+{
+    return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+}
+function getAfterCursorSelection()
+{
+    return textarea.value.substring(textarea.selectionEnd, textarea.value.length);
+}
+
+    </script>
+    
+    <style>
+
+@charset "utf-8";
+
+div {
+    font-family: Helvetica, Arial, Freesans, clean, sans-serif;
+	padding:1em;
+	margin:auto;
+	max-width:42em;
+}
+
+p {
+	line-height: 150%;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding-left: 8px;
+    padding-right: 40px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+tr:nth-child(even) {
+	background-color: #fbfbfb
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+h1 {
+    color: #000000;
+    font-size: 28px;
+}
+
+h2 {
+    border-bottom: 1px solid #CCCCCC;
+    color: #000000;
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+h4 {
+    font-size: 16px;
+}
+
+h5 {
+    font-size: 14px;
+}
+
+h6 {
+    color: #777777;
+    background-color: inherit;
+    font-size: 14px;
+}
+
+hr {
+    height: 0.2em;
+    border: 0;
+    color: #CCCCCC;
+    background-color: #CCCCCC;
+}
+
+p, blockquote, ul, ol, dl, li, table, pre {
+    margin: 15px 0;
+}
+
+code, pre {
+    border-radius: 3px;
+    background-color: #F8F8F8;
+    color: inherit;
+}
+
+code {
+    border: 1px solid #EAEAEA;
+    margin: 0 2px;
+    padding: 0 5px;
+}
+
+pre {
+    border: 1px solid #CCCCCC;
+    line-height: 1.25em;
+    overflow: auto;
+    padding: 6px 10px;
+}
+
+pre > code {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+a, a:visited {
+    color: #4183C4;
+    background-color: inherit;
+    text-decoration: none;
+}
+
+    </style>
+</head>
+
+<body>
+	<button onclick="table()">Format</button>
+    <textarea id="textarea" style="width: 100%; height: 95%; font-family: monospace; font-size: 14px;"></textarea>
+    <div id="markdown" style="display: none;"></div>
+    <div id="console" hidden=""></div>
+
+
+<style type="text/css">#EkleguLightBox {display:none; background:#fff; opacity:1; position:fixed; top:10%; left:5%; width:290px; height:60px; z-index:1000; border:2px solid #000;margin: 0px; padding:10px; padding-top:5px;}#EkleguLightBox > dl {margin: 0px; padding:0px;}#EkleguLightBox > dl > dt {margin: 0px; padding:0px; padding-top:5px; font-family:'Times New Roman',serif; font-size:14px; color:black; line-height: 1.0; font-weight: bold; text-decoration: none; background: transparent;}#EkleguLightBox > dl > dd {margin: 0px; padding:0px; padding-top:2px; font-family:'Times New Roman',serif; font-size:14px; color:black; line-height: 1.0; font-weight: normal; text-decoration: none; background: transparent;}</style><div id="EkleguLightBox" style="display: none;"></div></body></html>
