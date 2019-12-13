@@ -4,13 +4,33 @@
     <title>Asciidoc formatter</title>
     <script type="text/javascript">
 	
-	var textarea;
+var textarea;
 var markdown;
 var localStorageKey = 'content';
 window.onload = init;
 
 function init()
 {
+	var wd = "# Asciidoc Formatter  \n\n";
+	wd = wd + "Input:\n\n"
+	wd = wd + "```\n"
+	wd = wd + "|header1|header2|header3\n";
+	wd = wd + "|1|2|3\n";
+	wd = wd + "|aaa|bbb|ccc\n";
+	wd = wd + "|4|5|6\n";
+	wd = wd + "```\n"
+	wd = wd + "\n\n";
+	wd = wd + "Output by clicking Format button:\n\n"
+	wd = wd + "```\n"
+	wd = wd + "     |header1     |header2     |header3\n";
+	wd = wd + "     |1           |2           |3      \n";
+	wd = wd + "     |aaa         |bbb         |ccc    \n";
+	wd = wd + "     |4           |5           |6      \n";
+	wd = wd + "```\n"
+	wd = wd + "\n";
+
+
+
     textarea = document.getElementById("textarea");
     markdown = document.getElementById("markdown");
     
@@ -21,6 +41,7 @@ function init()
 	textarea.style.fontSize = 14 + "px";
 
     //getRegContent();
+	textarea.value = wd;
     
 
     textarea.select();
