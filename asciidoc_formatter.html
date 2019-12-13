@@ -142,30 +142,12 @@ function table()
         if (shouldTableize[i])
         {
             finalLineData[i] = data[i].join('     |');
-            //if (!finalLineData[i].startsWith('|'))
-            //{
-            //	isMarkdownTable = false;
-            //}
         }
         else
         {
             finalLineData[i] = data[i][0];
         }
     }
-//    if (isMarkdownTable)
-//    {
-//	    for(var i = 0; i < rowNum; i++)
-//	    {
-//	        if (shouldTableize[i])
-//	        {
-//            	finalLineData[i] = finalLineData[i].substring(1, finalLineData[i].length-1);
-//	        }
-//	    }
-//    }
-	for(var i = 0; i < rowNum; i++)
-	{
-		finalLineData[i] = '    |' + finalLineData[i];
-	}
     var finalText = finalLineData.join('\n');
 
 
