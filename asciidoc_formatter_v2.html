@@ -34,10 +34,10 @@ function init()
 	wd = wd + "```\n"
   wd = wd + '[cols="7s,7,7", options="header"]\n'
   wd = wd + '|===\n'
-  wd = wd + '   |header1    |header2  |header3\n'
-  wd = wd + ' 2+|1           2       a|3      \n'
-  wd = wd + '   |aaa     .2+|bbb      |ccc    \n'
-  wd = wd + '   |4           5        |6      \n'
+  wd = wd + '  |header1    |header2  |header3\n'
+  wd = wd + '2+|1           2       a|3      \n'
+  wd = wd + '  |aaa     .2+|bbb      |ccc    \n'
+  wd = wd + '  |4           5        |6      \n'
   wd = wd + '|===\n'
 	wd = wd + "```\n"
 	wd = wd + "\n";
@@ -227,9 +227,11 @@ function table()
             // finalLineData[i] = data[i].join('     |');
             // finalLineData[i] = data[i].join(getPipeWithStatus(status, isPipe, maxStatusLength));
             var text3 = "";
+            var withStartingExtraSpace = false; // first col no need extra space
             for (var j = 0; j < colNum; j++)
             {
-              text3 = text3 + getPipeWithStatus(status[i][j], isNoPipe[i][j], colStatusMaxLength[j]) + data[i][j];
+              text3 = text3 + getPipeWithStatus(withStartingExtraSpace, status[i][j], isNoPipe[i][j], colStatusMaxLength[j]) + data[i][j];
+              withStartingExtraSpace = true;
             }
             // finalLineData[i] = text3 + getPipeWithStatus(status[i][colNum-1], isNoPipe[i][j], colStatusMaxLength[j]) + data[i][colNum-1];
             finalLineData[i] = text3
@@ -263,13 +265,13 @@ function getPosition(string, subString, index)
   return string.split(subString, index).join(subString).length;
 }
 
-function getPipeWithStatus(status, isNoPipe, maxStatusLength)
+function getPipeWithStatus(withStartingExtraSpace, status, isNoPipe, maxStatusLength)
 {
   if (isNoPipe)
   {
-    return " " + " ".repeat(maxStatusLength) + " ";
+    return (withStartingExtraSpace ? " " : "") + " ".repeat(maxStatusLength) + " ";
   }
-  return " " + " ".repeat(maxStatusLength - status.length) + status + "|";
+  return (withStartingExtraSpace ? " " : "") + " ".repeat(maxStatusLength - status.length) + status + "|";
 }
 
 function createHeader(numCol, colMaxLength)
