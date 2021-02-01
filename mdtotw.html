@@ -29,12 +29,13 @@
 
     function mdToTw() {
       var text = getText();
-      var text2 = text.replaceAll("## > ", "!! > ");
+      var text2 = text.replaceAll("### > ", "!!! > ");
+      text2 = text2.replaceAll("## > ", "!! > ");
       text2 = text2.replaceAll("{{ site.baseurl }}", "https://roulesophy.github.io");
-      text2 = text2.replace(/!\[\]\((.*)\)/, "[img[$1]]");
-      text2 = text2.replace(/\[([^\[\]]+)\]\(([^\[\]]+)\)/, "[[$1|$2]]");
-      text2 = text2.replace(/\*\*([^\*]+)\*\*/, "''$1''");
-      text2 = text2.replace(/  \n/, "<br>\n");
+      text2 = text2.replaceAll(/!\[(.*)\]\((.*)\)/g, "[img[$2]]");
+      text2 = text2.replaceAll(/\[([^\[\]]+)\]\(([^\[\]]+)\)/g, "[[$1|$2]]");
+      text2 = text2.replaceAll(/\*\*([^\*]+)\*\*/g, "''$1''");
+      text2 = text2.replaceAll(/  \n/g, "<br>\n");
 
       setTextInRange(0, text2.length, text2);
     }
