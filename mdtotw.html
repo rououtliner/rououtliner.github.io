@@ -34,6 +34,8 @@
       text2 = text2.replace(/!\[\]\((.*)\)/, "[img[$1]]");
       text2 = text2.replace(/\[([^\[\]]+)\]\(([^\[\]]+)\)/, "[[$1|$2]]");
       text2 = text2.replace(/\*\*([^\*]+)\*\*/, "''$1''");
+      text2 = text2.replace(/  \n/, "<br>\n");
+
       setTextInRange(0, text2.length, text2);
     }
 
